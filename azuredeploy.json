@@ -289,7 +289,7 @@
         "grid_vm_name": "grid",
         "gridnode_nw_sg": "[concat(parameters('SAS Application Name'),'_',variables('gridnode_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
         "gridnode_vm_name": "gridnode",
-        "key_vault_name": "[concat(resourceGroup().name, 'kv-',variables('resourceGroupUniqueString'))]",
+        "key_vault_name": "[concat(parameters('SAS Application Name'), 'kv-',variables('resourceGroupUniqueString'))]",
         "key_vault_secretname_pubkey": "ansible-pubkey",
         "key_vault_secretname_pvtkey": "ansible-pvtkey",
         "key_vault_secretname_sasext": "sasextpw",
