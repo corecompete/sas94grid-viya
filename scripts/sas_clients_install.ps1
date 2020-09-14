@@ -7,10 +7,10 @@ param (
 	[string]$app_name,
 	[string]$mid_name,
 	[string]$domain_name,
-	[string]$artifact_loc
+	[string]$artifact_loc,
+	$code=99
 )
 #Function for Error Handling
-param($code=99)
 function ExitWithCode { 
 if($? -eq "true"){
   write-host("Commnad executed successfully")
