@@ -1986,7 +1986,8 @@
             "name": "Phase2-AnsibleSSLCopy",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', variables('ansible_vm_name'))]",
-                "[resourceId('Microsoft.Resources/deployments','Phase2-MetaInstall')]"
+                "[resourceId('Microsoft.Resources/deployments','Phase2-MetaInstall')]",
+                "[resourceId('Microsoft.Resources/deployments','Phase2-GridPSSInstall')]"
             ],
             "properties": {
                 "mode": "Incremental",

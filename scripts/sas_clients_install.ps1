@@ -7,10 +7,10 @@ param (
 	[string]$app_name,
 	[string]$mid_name,
 	[string]$domain_name,
-	[string]$artifact_loc
+	[string]$artifact_loc,
+	$code=99
 )
 #Function for Error Handling
-param($code=99)
 function ExitWithCode { 
 if($? -eq "true"){
   write-host("Commnad executed successfully")
@@ -50,7 +50,7 @@ if ($connectTestResult.TcpTestSucceeded) {
 Set-Location "Z:\${depot_folder_name}"
 .\setup.exe -lang en -deploy -datalocation C:\saslog -responsefile ${logdir}\clients_install.properties -quiet 
 ExitWithCode
-Start-Sleep -Seconds 1200
+Start-Sleep -Seconds 1500
 $latest = Get-ChildItem -Path ${logdir}\deployw* | Sort-Object LastAccessTime -Descending | Select-Object -First 1
 $latest.name
 Set-Location $logdir
