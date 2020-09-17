@@ -1987,7 +1987,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', variables('ansible_vm_name'))]",
                 "[resourceId('Microsoft.Resources/deployments','Phase2-MetaInstall')]",
-                "[resourceId('Microsoft.Resources/deployments','Phase2-GridPSSInstall')]"
+                "sasnodepsscopy"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -3368,7 +3368,7 @@
             "apiVersion": "2019-10-01",
             "name": "[concat('Phase2-GridNodePSSInstall', copyIndex(1))]",
             "copy": {
-                "name": "sasnodecopy",
+                "name": "sasnodepsscopy",
                 "count": "[parameters('Number of SAS94 Grid Nodes')]"
             },
             "dependsOn": [
@@ -3562,7 +3562,7 @@
                         "value": "[variables('mgt_vm_name')]"
                     },
                     "commandToExecute": {
-                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./lustre_pre_install.sh 2>&1 | tee /var/log/sas/install/lustre_pre_install.log')]"
+                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./lustre_pre_install.sh',' ',parameters('_artifactsLocation'),' ','2>&1 | tee /var/log/sas/install/lustre_pre_install.log')]"
                     },
                     "_artifactsLocation": {
                         "value": "[variables('lustre_pre_install_sh')]"
@@ -3764,7 +3764,7 @@
                         "value": "[variables('mdt_vm_name')]"
                     },
                     "commandToExecute": {
-                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./lustre_pre_install.sh',' ',variables('mgt_vm_name'),' ','2>&1 | tee /var/log/sas/install/lustre_pre_install.log')]"
+                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./lustre_pre_install.sh',' ',parameters('_artifactsLocation'),' ',variables('mgt_vm_name'),' ','2>&1 | tee /var/log/sas/install/lustre_pre_install.log')]"
                     },
                     "_artifactsLocation": {
                         "value": "[variables('lustre_pre_install_sh')]"
@@ -4026,7 +4026,7 @@
                         "value": "[concat(variables('oss_vm_name'), copyIndex(1))]"
                     },
                     "commandToExecute": {
-                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./lustre_pre_install.sh',' ',variables('mgt_vm_name'),' ',copyIndex(1),' ','2>&1 | tee /var/log/sas/install/lustre_pre_install.log')]"
+                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./lustre_pre_install.sh',' ',parameters('_artifactsLocation'),' ',variables('mgt_vm_name'),' ',copyIndex(1),' ','2>&1 | tee /var/log/sas/install/lustre_pre-req.log')]"
                     },
                     "_artifactsLocation": {
                         "value": "[variables('lustre_pre_install_sh')]"
@@ -4064,7 +4064,7 @@
                         "value": "[concat(variables('oss_vm_name'), copyIndex(1))]"
                     },
                     "commandToExecute": {
-                        "value": "[concat('set -o pipefail;','./oss_node_install.sh 2>&1 | tee /var/log/sas/install/pre-req.log')]"
+                        "value": "[concat('set -o pipefail;','./oss_node_install.sh 2>&1 | tee /var/log/sas/install/lustre_install.log')]"
                     },
                     "_artifactsLocation": {
                         "value": "[variables('oss_node_install_sh')]"

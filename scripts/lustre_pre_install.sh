@@ -1,13 +1,34 @@
-### Script 2 In All the Lustre Servers ###
 #!/bin/bash
-mkdir -p /logs
-log_file="/logs/phase2-`date +'%Y-%m-%d_%H-%M-%S'`.log"
-[ -f "$log_file" ] || touch "$log_file"
 set -x
-exec 1>> $log_file 2>&1
-#Varibales
 
-sasextpw=`facter sasextpw`  ##To be passed as variable
+## Functions
+fail_if_error() {
+  [ $1 != 0 ] && {
+    echo $2
+    exit 10
+  }
+}
+
+## Basic Pre Reqs for the SAS
+yum install ruby wget -y
+wget http://download-ib01.fedoraproject.org/pub/epel/7/x86_64/Packages/f/facter-2.4.1-1.el7.x86_64.rpm
+rpm  --reinstall -vh facter-2.*.rpm
+fail_if_error $? "ERROR: Facter packages installation failed."
+
+##Facter Variables and Declaration
+environmentLocation="/etc/facter/facts.d/variables.txt"
+if [ -f $environmentLocation ]; then
+	rm -f $environmentLocation
+fi
+
+cat << EOF > $environmentLocation
+artifact_loc=$1
+mgt_vm_name=$2
+index_value=$3
+EOF
+
+#Varibales
+artifact_loc=`facter artifact_loc`
 
 #ADD Users
 cat /etc/group |grep -wiq sas
@@ -17,57 +38,21 @@ else
    groupadd -g 5001 sas
 fi
  
-if [ ! -f /home/sasinst ]; then
-   useradd -u 1002 -g sas sasinst
-   echo ${sasextpw} | passwd sasinst --stdin
-else
-   echo "User sasinst exists"
-fi
- 
-if [ ! -f /home/sassrv ]; then
-   useradd -u 1003 -g sas sassrv
-   echo ${sasextpw} | passwd sassrv --stdin
-else
-   echo "User sassrv exists"
-fi
- 
-if [ ! -f /home/sasdemo ]; then
-   useradd -u 1005 -g sas sasdemo
-   echo ${sasextpw} | passwd sasdemo --stdin
-else
-   echo "User sasdemo exists"
-fi
- 
-if [ ! -f /home/lsfadmin ]; then
-   useradd -u 1006 -g sas lsfadmin
-   echo ${sasextpw} | passwd lsfadmin --stdin
-else
-   echo "User lsfadmin exists"
-fi
+username=("sasinst" "sassrv" "sasdemo" "lsfadmin")
+userid=("1002" "1003" "1005" "1006")
+for ((i=0;i<${#username[@]};++i));
+do
+    if [ ! -f /home/${username[$i]} ]; then
+        useradd -u ${userid[$i]} -g sas ${username[$i]}
+        fail_if_error $? "ERROR: failed to create ${username[$i]} User"
+        #echo ${sasextpw} | passwd ${username[$i]} --stdin
+    else 
+        echo "User ${username[$i]} exists"
+    fi
+done
 echo "**************SAS Admin Users created successfully.***************"
 
-## Basic Pre Reqs for the SAS
-yum install ruby wget -y
-wget http://download-ib01.fedoraproject.org/pub/epel/7/x86_64/Packages/f/facter-2.4.1-1.el7.x86_64.rpm
-rpm  --reinstall -vh facter-2.*.rpm
 
-if [ $? -eq 0 ] ;then
-   echo "Facter Installation Sucess"
-else
-   echo "ERROR: Facter module installation failed."
-   exit 1
-fi
-
-##Facter Variables and Declaration
-environmentLocation="/etc/facter/facts.d/variables.txt"
-if [ -f $environmentLocation ]; then
-	rm -f $environmentLocation
-fi
-
-cat << EOF > $environmentLocation
-mgt_vm_name=$1
-index_value=$2
-EOF
 
 ## Creating the repo configuration for dowloading all the rpm packages based on the server version
 cat >/tmp/lustre-repo.conf <<\__EOF
@@ -89,51 +74,29 @@ echo "Repo configured"
 sed -i s/SELINUX=enforcing/SELINUX=disabled/g /etc/sysconfig/selinux
 ## Installing dependency packages
 yum install createrepo yum-utils cifs-utils  nfs-utils -y
-if [ $? -eq 0 ] 
-then
-echo "Dependency packages installation successful."
-else
-echo "ERROR: Dependency packages installation failed."
-exit 1
-fi
+fail_if_error $? "ERROR: Dependency packages installation failed."
+
 
 # Downloading all the rpm packegs required for the lustre
 mkdir -p  /opt/lustre-temp/
 cd /opt/lustre-temp/
-reposync -c /tmp/lustre-repo.conf -n -r lustre-server -r lustre-client -r e2fsprogs-wc
-if [ $? -eq 0 ] 
-then
-echo "Dependency packages downloaded successful."
-else
-echo "ERROR: failed to download dependency packages."
-exit 1
-fi
+wget ${artifact_loc}lustre_rpm_packages/lustre_packages.zip
+unzip lustre_packages.zip
 
 echo "Downloading and installing kernel dependency packages"
-wget http://rpmfind.net/linux/centos/7/os/x86_64/Packages/resource-agents-4.1.1-46.el7.x86_64.rpm
-wget http://rpmfind.net/linux/centos/7/os/x86_64/Packages/psmisc-22.20-16.el7.x86_64.rpm
-rpm -ivh *.rpm
-if [ $? -eq 0 ] 
-then
-echo " Kernel dependency installed successfully."
-else
-echo "ERROR: failed to install kernel dependency packages."
-exit 1
-fi
+yum localinstall resource-agents-4.1.1-46.el7.x86_64.rpm psmisc-22.20-16.el7.x86_64.rpm -y
+fail_if_error $? "ERROR: failed to install kernel dependency packages."
+
 ## Please check the kernel only rpm package kernel-3.* In My case it is 3.
-cd /opt/lustre-temp/lustre-server/RPMS/x86_64/
 yum localinstall kernel-3.10.0-1062.9.1.el7_lustre.x86_64.rpm  -y
-if [ $? -eq 0 ] 
-then
-echo "Kernel installation completed successful."
-else
-echo "ERROR: Kernel installation failed."
-exit 1
-fi
+fail_if_error $? "ERROR: Kernel installation failed."
+
+
 yum install xorg-x11-xauth.x86_64 xorg-x11-server-utils.x86_64 dbus-x11.x86_64 -y
+fail_if_error $? "ERROR: RHEL Package installation failed."
+
 echo  "options lnet networks=tcp" >> /etc/modprobe.d/lustre.conf
 echo "Rebooting the system."
- 
 echo  "* * * * * sleep 10;/sbin/shutdown -r now" >> /var/spool/cron/root
 echo "@reboot crontab -r" >> /var/spool/cron/root
 

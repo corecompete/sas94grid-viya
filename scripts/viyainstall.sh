@@ -98,19 +98,6 @@ sed -i "/\[ComputeServer\]/{n;s/.*/$spre_vm_name/}" $inventory
 sed -i "/\[Operations\]/{n;s/.*/$spre_vm_name/}" $inventory
 sed -i "/\[programming\]/{n;s/.*/$spre_vm_name/}" $inventory
 
-#Only for internal purpose(corecompete)
-sed -i "/\[elasticsearch\]/{n;s/.*//}" $inventory
-sed -i "/\[espServer\]/{n;s/.*//}" $inventory
-sed -i "/\[espStreamviewer\]/{n;s/.*//}" $inventory
-sed -i "/\[espStudio\]/{n;s/.*//}" $inventory
-sed -i "/\[sviconfig\]/{n;s/.*//}" $inventory
-sed -i "/\[viprCommon\]/{n;s/.*//}" $inventory
-sed -i "/\[viprESM\]/{n;s/.*//}" $inventory
-sed -i "/\[viprEntity\]/{n;s/.*//}" $inventory
-sed -i "/\[viprVi\]/{n;s/.*//}" $inventory
-sed -i "/\[viprVsd\]/{n;s/.*//}" $inventory
-sed -i "/\[viprSand\]/{n;s/.*//}" $inventory
-
 cat <<EOF >> caswork.txt
 $spre_vm_name
 $cascontroller_vm_name
@@ -135,7 +122,8 @@ elif [[ "$SCRIPT_PHASE" -eq 3 ]]; then
 
 elif [[ "$SCRIPT_PHASE" -eq 4 ]]; then
         wget $viya_ark_uri
-        tar -xzvf viya-ark.tar.gz -C $playbook_directory
+        mkdir -p $playbook_directory/viya-ark
+        tar -xzvf viya-ark.tar.gz -C $playbook_directory/viya-ark/
         ssh -tT $user@${spre_host} << EOF
 echo "export SASMAKEHOMEDIR=1"     >> /opt/sas/viya/config/etc/spawner/default/spawner_usermods.sh
 echo "export SASHOMEDIRPERMS=0700" >> /opt/sas/viya/config/etc/spawner/default/spawner_usermods.sh
