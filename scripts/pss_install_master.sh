@@ -73,11 +73,11 @@ yum install kernel-$VER kernel-devel-$VER kernel-headers-$VER kernel-abi-whiteli
 fail_if_error $? "ERROR: kernel package installation failed."
 
 echo "Downloading and installing lustre packages "
-mkdir -p /package
-cd /package
-wget https://downloads.whamcloud.com/public/lustre/lustre-2.12.4/el7.7.1908/client/RPMS/x86_64/lustre-client-2.12.4-1.el7.x86_64.rpm
-wget https://downloads.whamcloud.com/public/lustre/lustre-2.12.4/el7.7.1908/client/RPMS/x86_64/kmod-lustre-client-2.12.4-1.el7.x86_64.rpm
-yum localinstall *.rpm -y
+mkdir -p /tmp/lustre_package
+cd /tmp/lustre_package
+wget ${artifact_loc}lustre_rpm_packages/lustre_packages.zip
+unzip lustre_packages.zip
+yum localinstall lustre-client-2.12.4-1.el7.x86_64.rpm kmod-lustre-client-2.12.4-1.el7.x86_64.rpm -y
 fail_if_error $? "ERROR: Client installation failed."
 
 yum install xorg-x11-xauth.x86_64 xorg-x11-server-utils.x86_64 dbus-x11.x86_64 -y
