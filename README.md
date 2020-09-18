@@ -106,7 +106,7 @@ SAS Grid requires a network share that all computers on your cluster can access.
 
  * 1 x Management Service(MGT)
  * 1 x Metadata Service(MDT)
- * n x Object Storage Service(OSS)
+ * n x Object Storage Service(OSS) (Number to be specified by user while launching Quick Start)
 
 
 <a name="ViyaComponents"></a>
@@ -132,6 +132,7 @@ For <b>Grid Controller Server</b>, choose from this list for:
 
 |  VCPUS 	  |	Virtual Machine  | SKU	Memory (RAM)  |	Temporary Storage |
 | --------------- | ---------------- | ------------------ | ----------------- |
+|   4             |  Standard_E4s_v3  | 32 GB		  |  64 GB            |
 |   8	          |  Standard_E8s_v3 |	64 GB             |  128 GB           |
 |   16	          |  Standard_E16s_v3 |	128 GB            |  256 GB           |
 |   4             |  Standard_DS12_v2 | 28 GB             |  56 GB            |
@@ -143,6 +144,7 @@ For <b>Grid Nodes</b>, choose from this list for:
 
 |  VCPUS 	  |	Virtual Machine  | SKU	Memory (RAM)  |	Temporary Storage |
 | --------------- | ---------------- | ------------------ | ----------------- |
+|   4             | Standard_E4s_v3  | 32 GB		  |  64 GB            |
 |   8	          |  Standard_E8s_v3 |	64 GB             |  128 GB           |
 |   16	          |  Standard_E16s_v3 |	128 GB            |  256 GB           |
 |   32            |  Standard_E16s_v3 |  256 GB           |  512 GB           |
@@ -157,7 +159,7 @@ For the <b>Mid-Tier server</b>, choose a machine between 4 to 8 cores with suffi
 
 For <b>Management Service(MGT)</b>, the default VM size has been taken as "standard_F4s_v2".
 
-For <b>Metadata Service(MDT)</b>, the default VM size has been taken as "standard_F4s_v2".
+For <b>Lustre Metadata Service(MDT)</b>, the default VM size has been taken as "standard_F4s_v2".
 
 For <b>Object Storage Service(OSS)</b>, choose between 8 to 16 cores (Standard_E8s_v3 or Standard_E16s_v3) and optimum memory
 
@@ -173,9 +175,18 @@ Choose a machine of minimum 8 cores with 60 GB memory for Microservices. Some ch
 
 <b>SPRE Server:</b>
 
-SPRE Server is responsible for the Compute actions in the Viya environment. Choose a machine with a minimum of 8 cores. Viable choices include:
- * Standard_E8s_v3 (or E16s_v3/E32s_v3)
- * Standard_D8s_v3 (or D16s_v3/D32s_v3)
+SPRE Server provides access to a 9.4 compute engine in a Viya environment. Viable choices include:
+
+|  VCPUS 	  |	Virtual Machine  | SKU	Memory (RAM)  |	Temporary Storage |
+| --------------- | ---------------- | ------------------ | ----------------- |
+|   4             | Standard_E4s_v3  | 32 GB		  |  64 GB            |
+|   8	          |  Standard_E8s_v3 |	64 GB             |  128 GB           |
+|   16	          |  Standard_E16s_v3 |	128 GB            |  256 GB           |
+|   32            |  Standard_E32s_v3 |  256 GB           |  512 GB           |
+|   4             |  Standard_DS12_v2 | 28 GB             |  56 GB            |
+|   8             |  Standard_DS13_v2 | 56 GB             |  112 GB           |
+|   16            |  Standard_DS14_v2 | 112 GB            |  224 GB           |
+
 
 <b>CAS Controller and Workers Nodes:</b>
 
@@ -183,6 +194,7 @@ For <b>CAS Controller Server</b>, choose from this list for:
 
 |  VCPUS 	  |	Virtual Machine  | SKU	Memory (RAM)  |	Temporary Storage |
 | --------------- | ---------------- | ------------------ | ----------------- |
+|   4             | Standard_E4s_v3  | 32 GB		  |  64 GB            |
 |   8	          |  Standard_E8s_v3 |	64 GB             |  128 GB           |
 |   16	          |  Standard_E16s_v3 |	128 GB            |  256 GB           |
 |   4             |  Standard_DS12_v2 | 28 GB             |  56 GB            |
@@ -194,6 +206,7 @@ For <b>CAS Worker Nodes</b>, choose from this list for:
 
 |  VCPUS 	  |	Virtual Machine  | SKU	Memory (RAM)  |	Temporary Storage |
 | --------------- | ---------------- | ------------------ | ----------------- |
+|   4             | Standard_E4s_v3  | 32 GB		  |  64 GB            |
 |   8	          |  Standard_E8s_v3 |	64 GB             |  128 GB           |
 |   16	          |  Standard_E16s_v3 |	128 GB            |  256 GB           |
 |   32            |  Standard_E16s_v3 |  256 GB           |  512 GB           |
@@ -213,7 +226,7 @@ Before deploying SAS Quickstart Template for Azure, you must have the following:
     * Microsoft.KeyVault/vaults/*/read
 * Sufficient quota for the number of Cores in Azure Account to accommodate all the servers in the SAS 9.4 and SAS Viya ecosystem. Please check your [subscription limits](https://docs.microsoft.com/en-us/answers/questions/10982/where-do-i-see-the-current-azure-vm-quota-limits-f.html) before launching the QuickStart.  You can request an increase in standard vCPU quota limits per VM series from [Microsoft support](https://docs.microsoft.com/en-us/azure/azure-portal/supportability/per-vm-quota-requests). 
 * A resource group that does not already contain a Quickstart deployment. For more information, see [Resource groups](https://docs.microsoft.com/en-us/azure/azure-resource-manager/resource-group-overview#resource-groups).
-* All the Server types you select must support [Accelerated Networking](https://azure.microsoft.com/en-us/updates/accelerated-networking-in-expanded-preview/) and [Premium Storage](https://docs.microsoft.com/en-us/azure/virtual-machines/disks-types#premium-ssd)
+* All the Server types you select must support [Accelerated Networking](https://docs.microsoft.com/en-us/azure/virtual-network/create-vm-accelerated-networking-cli) and [Premium Storage](https://docs.microsoft.com/en-us/azure/virtual-machines/disks-types#premium-ssd)
 * You would need AzureKeyVault Owner ID and SSH Public key to be provided in the parameters at the time of deployment. Follow the instructions on 
     * To Get the AzureKeyVault OwnerID, run the below command in the Azure Powershell.
         `Get-AzADUser -UserPrincipalName <user@domain.com> | grep Id`
