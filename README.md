@@ -78,7 +78,7 @@ The QuickStart will setup the following environment on Microsoft Azure:
 * In the Application subnets (private subnet), Virtual Machines for:
 	* <b>SAS 9.4 Grid</b>  – Grid Controller, Grid Nodes, Metadata, and Mid-Tier Servers
   * <b>Lustre Platform</b> - Management Service(MDT), Metadata Service(MDS), and Object Storage Service(OSS) Servers
-	* <b>SAS Viya</b> – Microservices, SPRE, Cloud Analytics Services (CAS) Controller and CAS Worker Servers
+  * <b>SAS Viya</b> - Microservices, SPRE, Cloud Analytics Services (CAS) Controller and CAS Worker Servers
 * Disks required for SAS Binaries, Configuration, and Data will be provisioned using Premium Disks in Azure.
 * Security groups for Virtual Machines and Subnets.
 * Accelerated Networking is enabled on all the network interfaces.
