@@ -129,40 +129,26 @@ In Azure, instance sizes are based on virtual CPUs (vcpus) which equates to 2 vc
 ### SAS 9.4 Grid Sizing
 Here are some recommended Machine Types for SAS 9.4 Grid environment:
 
-For <b>Grid Controller Server</b>, choose from this list for:
+For <b>Grid Controller Server</b> we recommend Standard_E8s_v3 – 4 physical cores, 8 vcpu, 64GB RAM, 128 GB temp storage SSD.
 
-|  VCPUS 	  |	Virtual Machine  | SKU	Memory (RAM)  |	Temporary Storage |
-| --------------- | ---------------- | ------------------ | ----------------- |
-|   4             |  Standard_E4s_v3  | 32 GB		  |  64 GB            |
-|   8	          |  Standard_E8s_v3 |	64 GB             |  128 GB           |
-|   16	          |  Standard_E16s_v3 |	128 GB            |  256 GB           |
-|   4             |  Standard_DS12_v2 | 28 GB             |  56 GB            |
-|   8             |  Standard_DS13_v2 | 56 GB             |  112 GB           |
-|   16            |  Standard_DS14_v2 | 112 GB            |  224 GB           |
-  
-
+ 
 For <b>Grid Nodes</b>, choose from this list for:
 
 |  VCPUS 	  |	Virtual Machine  | SKU	Memory (RAM)  |	Temporary Storage |
 | --------------- | ---------------- | ------------------ | ----------------- |
-|   4             | Standard_E4s_v3  | 32 GB		  |  64 GB            |
 |   8	          |  Standard_E8s_v3 |	64 GB             |  128 GB           |
 |   16	          |  Standard_E16s_v3 |	128 GB            |  256 GB           |
-|   32            |  Standard_E16s_v3 |  256 GB           |  512 GB           |
-|   4             |  Standard_DS12_v2 | 28 GB             |  56 GB            |
-|   8             |  Standard_DS13_v2 | 56 GB             |  112 GB           |
-|   16            |  Standard_DS14_v2 | 112 GB            |  224 GB           |
-
+|   32            |  Standard_E32s_v3 |  256 GB           |  512 GB           |
   
-For <b>Metadata Server</b>, We recommend to choose instance types which have minimum  4 physical cores or 8 vcpu and 32GB RAM such as <b>Standard_D4s_v3 or Standard_D8s_v3</b>
+For <b>Metadata Server</b>, We recommend <b>Standard_D8s_v3</b>
 
-For the <b>Mid-Tier server</b>, Start with 4 physical cores with sufficient memory (minimum 40 GB) to support Web Application JVMs, We recommend: <b>Standard_DS13_v2, Standard_E8s_v3, or Standard_D8s_v3</b>.
+For the <b>Mid-Tier server</b>, Start with 4 physical cores with sufficient memory (minimum 40 GB) to support Web Application JVMs, We recommend: <b>Standard_E8s_v3, or Standard_D8s_v3</b>.
 
 For <b>Management Service(MGT)</b>, the default VM size has been taken as "standard_F4s_v2".
 
 For <b>Lustre Metadata Service(MDT)</b>, the default VM size has been taken as "standard_F4s_v2".
 
-For <b>Object Storage Service(OSS)</b>, choose between 8 to 16 cores (Standard_E8s_v3 or Standard_E16s_v3) and optimum memory
+For <b>Object Storage Service(OSS)  </b>, select <b> Standard_E8s_v3 </b>.
 
 <a name="ViyaSizing"></a>
 ### SAS Viya Sizing
@@ -179,40 +165,24 @@ SPRE Server provides access to a 9.4 compute engine in a Viya environment. Viabl
 
 |  VCPUS 	  |	Virtual Machine  | SKU	Memory (RAM)  |	Temporary Storage |
 | --------------- | ---------------- | ------------------ | ----------------- |
-|   4             | Standard_E4s_v3  | 32 GB		  |  64 GB            |
 |   8	          |  Standard_E8s_v3 |	64 GB             |  128 GB           |
 |   16	          |  Standard_E16s_v3 |	128 GB            |  256 GB           |
 |   32            |  Standard_E32s_v3 |  256 GB           |  512 GB           |
-|   4             |  Standard_DS12_v2 | 28 GB             |  56 GB            |
-|   8             |  Standard_DS13_v2 | 56 GB             |  112 GB           |
-|   16            |  Standard_DS14_v2 | 112 GB            |  224 GB           |
+|   8             |  Standard_D8s_v3 | 32 GB             |  64 GB            |
+|   16             |  Standard_D16s_v3 | 64 GB             |  128 GB           |
+|   32            |  Standard_D32s_v3 | 128 GB            |  256 GB           |
 
 
 <b>CAS Controller and Workers Nodes:</b>
 
-For <b>CAS Controller Server</b>, choose from this list for:
+For <b>CAS Controller Server & Worker Nodes </b>, choose from this list for:
 
 |  VCPUS 	  |	Virtual Machine  | SKU	Memory (RAM)  |	Temporary Storage |
 | --------------- | ---------------- | ------------------ | ----------------- |
-|   4             | Standard_E4s_v3  | 32 GB		  |  64 GB            |
 |   8	          |  Standard_E8s_v3 |	64 GB             |  128 GB           |
 |   16	          |  Standard_E16s_v3 |	128 GB            |  256 GB           |
-|   4             |  Standard_DS12_v2 | 28 GB             |  56 GB            |
-|   8             |  Standard_DS13_v2 | 56 GB             |  112 GB           |
-|   16            |  Standard_DS14_v2 | 112 GB            |  224 GB           |
+|   32	          |  Standard_E32s_v3 |	256 GB            |  512 GB           |
   
-
-For <b>CAS Worker Nodes</b>, choose from this list for:
-
-|  VCPUS 	  |	Virtual Machine  | SKU	Memory (RAM)  |	Temporary Storage |
-| --------------- | ---------------- | ------------------ | ----------------- |
-|   4             | Standard_E4s_v3  | 32 GB		  |  64 GB            |
-|   8	          |  Standard_E8s_v3 |	64 GB             |  128 GB           |
-|   16	          |  Standard_E16s_v3 |	128 GB            |  256 GB           |
-|   32            |  Standard_E16s_v3 |  256 GB           |  512 GB           |
-|   4             |  Standard_DS12_v2 | 28 GB             |  56 GB            |
-|   8             |  Standard_DS13_v2 | 56 GB             |  112 GB           |
-|   16            |  Standard_DS14_v2 | 112 GB            |  224 GB           |
 
 <a name="Prerequisites"></a>
 ## Prerequisites
