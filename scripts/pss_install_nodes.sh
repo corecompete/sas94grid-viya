@@ -54,7 +54,7 @@ done
 ### Lustre client installation 
 echo "Installing kernel package"
 VER="3.10.0-1062.9.1.el7"
-yum install kernel-$VER kernel-devel-$VER kernel-headers-$VER kernel-abi-whitelists-$VER kernel-tools-$VER kernel-tools-libs-$VER kernel-tools-libs-devel-$VER -y
+yum install kernel-$VER kernel-devel-$VER kernel-headers-$VER kernel-abi-whitelists-$VER kernel-tools-$VER kernel-tools-libs-$VER kernel-tools-libs-devel-$VER -y --skip-broken
 fail_if_error $? "ERROR: kernel package installation failed."
 
 echo "Downloading and installing lustre packages "
