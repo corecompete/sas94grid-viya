@@ -2,70 +2,71 @@
     "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
     "contentVersion": "1.0.0.0",
     "parameters": {
-        "SAS Application Name": {
+        "SASApplicationName": {
             "minLength": 2,
-            "maxLength": 5,
+            "maxLength": 6,
             "type": "String",
+            "defaultValue": "gridvi",
             "metadata": {
                 "description": "This tag will be used as a prefix for the hostname of the SAS servers and Azure resources"
             }
         },
-        "Admin Ingress Location": {
+        "adminIngresslocation": {
             "type": "String",
             "metadata": {
                 "description": "Allow inbound SSH traffic to the Ansible Controller-Bastion Host from this CIDR block or IP address range. Must be a valid IP or CIDR range of the form x.x.x.x or x.x.x.x/x"
             }
         },
-        "Vnet Address CIDR": {
+        "vnetAddressCIDR": {
             "defaultValue": "10.10.0.0/16",
             "type": "String",
             "metadata": {
                 "description": "Virtual Network CIDR, ex. 10.10.0.0/16"
             }
         },
-        "Ansible-Bastion PublicSubnet CIDR": {
+        "ansibleBastionPublicSubnetCIDR": {
             "defaultValue": "10.10.1.0/24",
             "type": "String",
             "metadata": {
                 "description": "Virtual Network Public Subnet CIDR, ex. 10.10.1.0/24 which should allign with VNET CIDR"
             }
         },
-        "SAS94 PrivateSubnet CIDR": {
+        "SASGridPrivateSubnetCIDR": {
             "defaultValue": "10.10.2.0/24",
             "type": "String",
             "metadata": {
                 "description": "Virtual Network Private Subnet CIDR, ex. 10.10.2.0/24 which should allign with VNET CIDR"
             }
         },
-        "SAS94 Meta VM Size": {
+        "SASGridMetaVmSize": {
             "defaultValue": "Standard_D4s_v3",
             "type": "String",
             "metadata": {
                 "description": "This is the SKU for the Meta VM.The default SKU value represents the minimum recommended size for system stability in most SAS software license sets. The selected SKU must support premium disks. For details: https://azure.microsoft.com/en-in/pricing/details/virtual-machines/red-hat/"
             }
         },
-        "SAS94 Mid VM Size": {
+        "SASGridMidVmSize": {
             "defaultValue": "Standard_E8s_v3",
             "type": "String",
             "metadata": {
                 "description": "This is the SKU for the Mid VM. The default SKU value represents the minimum recommended size for system stability in most SAS software license sets. The selected SKU must support premium disks. For details: https://azure.microsoft.com/en-in/pricing/details/virtual-machines/red-hat/"
             }
         },
-        "SAS94 Grid VM Size": {
+        "SASGridControllerVmSize": {
             "defaultValue": "Standard_E8s_v3",
             "type": "String",
             "metadata": {
                 "description": "This is the SKU for the Grid VM.The default SKU value represents the minimum recommended size for system stability in most SAS software license sets. The selected SKU must support premium disks. For details: https://azure.microsoft.com/en-in/pricing/details/virtual-machines/red-hat/"
             }
         },
-        "SAS94 Grid Node VM Size": {
+        "SASGridNodeVmSize": {
             "defaultValue": "Standard_D4s_v3",
             "type": "String",
             "metadata": {
                 "description": "This is the SKU for the Grid Node VM.The default SKU value represents the minimum recommended size for system stability in most SAS software license sets. The selected SKU must support premium disks. For details: https://azure.microsoft.com/en-in/pricing/details/virtual-machines/red-hat/"
             }
         },
-        "Number of SAS94 Grid Nodes": {
+        "numberOfSASGridNodes": {
             "defaultValue": 1,
             "minValue": 1,
             "maxValue": 100,
@@ -74,7 +75,7 @@
                 "description": "The number of SAS Grid Node to create."
             }
         },
-        "SAS External Password": {
+        "SASExternalPassword": {
             "minLength": 12,
             "maxLength": 14,
             "type": "SecureString",
@@ -82,7 +83,7 @@
                 "description": "Password for RDP login & SAS admin account in SAS servers(SAS94:sasadm,SAS Viya:sas)"
             }
         },
-        "SAS Internal Password": {
+        "SASInternalPassword": {
             "minLength": 8,
             "maxLength": 15,
             "type": "SecureString",
@@ -90,21 +91,21 @@
                 "description": "Password for SAS Internal Accounts(SAS94: Metadata & WIP, SAS Viya:cas)"
             }
         },
-        "Lustre PrivateSubnet CIDR": {
+        "lustrePrivateSubnetCIDR": {
             "type": "String",
             "defaultValue": "10.10.3.0/24",
             "metadata": {
                 "description": "Virtual Network Private Subnet CIDR, ex. 10.10.3.0/24 which should allign with VNET CIDR"
             }
         },
-        "Lustre OSS Node VM Size": {
+        "lustreOSSNodeVmSize": {
             "defaultValue": "Standard_E16s_v3",
             "type": "String",
             "metadata": {
                 "description": "This is the SKU for the lustre OSS Node VM."
             }
         },
-        "Number of Lustre OSS Nodes": {
+        "numberOfLustreOSSNodes": {
             "type": "int",
             "defaultValue": 1,
             "minValue": 1,
@@ -113,51 +114,51 @@
                 "description": "Number of Lustre Nodes to be created"
             }
         },
-        "SAS94 Lustre Data Storage": {
+        "SASLustreDataStorage": {
             "defaultValue": 100,
             "minValue": 100,
             "maxValue": 32767,
             "type": "Int",
             "metadata": {
-                "description": "The SAS data volume size for SAS 94 Gird. The total storage will be the multiple of OSS nodes and storage (i.e. Number of Lustre OSS Nodes * SAS94 Lustre Data Storage)"
+                "description": "The SAS data volume size for SAS 94 Gird. The total storage will be the multiple of OSS nodes and storage (i.e. numberOfLustreOSSNodes * SASLustreDataStorage)"
             }
         },
-        "Viya PrivateSubnet CIDR": {
+        "viyaPrivateSubnetCIDR": {
             "type": "String",
             "defaultValue": "10.10.4.0/24",
             "metadata": {
                 "description": "Virtual Network Private Subnet CIDR, ex. 10.10.3.0/24 which should allign with VNET CIDR"
             }
         },
-        "Viya Microservices VM Size": {
+        "viyaMicroservicesVmSize": {
             "defaultValue": "Standard_E16s_v3",
             "type": "String",
             "metadata": {
                 "description": "This is the SKU for the MicroServices VM. The default SKU value represents the minimum recommended size for system stability in most SAS software license sets. The selected SKU must support premium disks. For details: https://azure.microsoft.com/en-in/pricing/details/virtual-machines/red-hat/"
             }
         },
-        "Viya SPRE VM Size": {
+        "viyaSPREVmSize": {
             "defaultValue": "Standard_E8s_v3",
             "type": "String",
             "metadata": {
                 "description": "This is the SKU for the SPRE VM. The default SKU value represents the minimum recommended size for system stability in most SAS software license sets. The selected SKU must support premium disks. For details: https://azure.microsoft.com/en-in/pricing/details/virtual-machines/red-hat/"
             }
         },
-        "Viya CAS Controller VM Size": {
+        "viyaCASControllerVmSize": {
             "defaultValue": "Standard_E8s_v3",
             "type": "String",
             "metadata": {
                 "description": "This is the SKU for the CASController VM. The default SKU value represents the minimum recommended size for system stability in most SAS software license sets. The selected SKU must support premium disk. For details: https://azure.microsoft.com/en-in/pricing/details/virtual-machines/red-hat/"
             }
         },
-        "Viya CAS Worker VM Size": {
+        "viyaCASWorkerVmSize": {
             "defaultValue": "Standard_E8s_v3",
             "type": "String",
             "metadata": {
                 "description": "This is the SKU for the CAS Worker VM. The default SKU value represents the minimum recommended size for system stability in most SAS software license sets. The selected SKU must support premium disks. For details: https://azure.microsoft.com/en-in/pricing/details/virtual-machines/red-hat/"
             }
         },
-        "Number Of Viya CAS Nodes": {
+        "numberOfViyaCASNodes": {
             "defaultValue": 1,
             "minValue": 1,
             "maxValue": 100,
@@ -166,7 +167,7 @@
                 "description": "The number of CAS Worker Nodes to create."
             }
         },
-        "SAS Viya Data Storage": {
+        "SASViyaDataStorage": {
             "defaultValue": 100,
             "minValue": 100,
             "maxValue": 32767,
@@ -175,49 +176,49 @@
                 "description": "The SAS data volume size for SAS Viya."
             }
         },
-        "Storage Account Name": {
+        "storageAccountName": {
             "type": "String",
             "metadata": {
                 "description": "Storage Account Name where SAS Depot is located"
             }
         },
-        "Storage Account Key": {
+        "storageAccountKey": {
             "type": "SecureString",
             "metadata": {
-                "description": "Storage Account Key"
+                "description": "storageAccountKey"
             }
         },
-        "File Share Name": {
+        "fileShareName": {
             "type": "String",
             "metadata": {
-                "description": "File Share Name where SASDepot is located"
+                "description": "fileShareName where SASDepot is located"
             }
         },
-        "SASDepot Folder": {
+        "SASDepotFolder": {
             "type": "String",
             "metadata": {
                 "description": "Folder Name in Azure File share where SAS94 depot is located"
             }
         },
-        "Viyarepo Folder": {
+        "viyaRepoFolder": {
             "type": "String",
             "metadata": {
                 "description": "Folder Name in Azure File share where SAS Viya Repo is located"
             }
         },
-        "SAS94 Server license file": {
+        "SASServerLicenseFile": {
             "type": "String",
             "metadata": {
                 "description": "Name of SAS Application Server License file.You will find this file inside the SAS Software Depot. It should be inside the folder sid_file."
             }
         },
-        "SAS94 Grid license file": {
+        "SASGridLicenseFile": {
             "type": "String",
             "metadata": {
                 "description": "Name of SAS Application Server License file.You will find this file inside the SAS Software Depot. It should be inside the folder sid_file."
             }
         },
-        "SAS LSF license file": {
+        "SASLsfLicenseFile": {
             "type": "String",
             "metadata": {
                 "description": "Name of SAS Application Server License file.You will find this file inside the SAS Software Depot. It should be inside the folder sid_file."
@@ -229,13 +230,13 @@
                 "description": "The full ssh public key that will be added to the servers."
             }
         },
-        "KeyVault Owner ID": {
+        "KeyVaultOwnerID": {
             "type": "string",
             "metadata": {
                 "description": "Key Vault Owner Object ID,Specifies the object ID of a user, service principal or security group in the Azure Active Directory tenant for the vault.Get it by using Get-AzADUser or Get-AzADServicePrincipal cmdlets. e.g.In Azure Cloud PowerShell type PS> Get-AzADUser -UserPrincipalName user@domain.com | grep Id"
             }
         },
-        "Location": {
+        "location": {
             "type": "string",
             "defaultValue": "[resourceGroup().location]",
             "metadata": {
@@ -243,28 +244,34 @@
             }
         },
         "_artifactsLocation": {
-			"defaultValue": "https://raw.githubusercontent.com/corecompete/sas94grid-viya/master/",
-            "type": "String",
+            "type": "string",
+            "defaultValue": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/sas9.4-viya/",
             "metadata": {
-                "description": "For a standard deployment, keep the default.  The https URL to the base of the deployment files in Microsoft Azure. If a SAS key is needed, please do not include the SAS key in the URL. Instead, add the part after and include the question mark to the _artifactsLocationSasToken variable. ex. https://(STORAGE_ACCOUNT).file.core.windows.net/(SHARE_NAME)/(SUBDIRECTORY_NAME)/"
+                "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
+            }
+        },
+        "_artifactsLocationSasToken": {
+            "type": "securestring",
+            "defaultValue": "",
+            "metadata": {
+                "description": "The sasToken required to access _artifactsLocation.  When the template is deployed using the accompanying scripts, a sasToken will be automatically generated. Use the defaultValue if the staging location is not secured."
             }
         }
     },
     "variables": {
-        "_artifactsLocationSasToken": "",
         "access_policy_template": "[concat(parameters('_artifactsLocation'),'nestedtemplates/access_policy.json', variables('_artifactsLocationSasToken'))]",
         "agent_startup_gridnodes_sh": "[concat(parameters('_artifactsLocation'),'scripts/agent_startup_gridnodes.sh', variables('_artifactsLocationSasToken'))]",
-        "ansible_nw_interface": "[concat(parameters('SAS Application Name'),'_',variables('ansible_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
-        "ansible_nw_sg": "[concat(parameters('SAS Application Name'),'_',variables('ansible_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
-        "ansible_pub_nw_interface": "[concat(parameters('SAS Application Name'),'_',variables('ansible_vm_name'),'_pub_nic_',variables('resourceGroupUniqueString'))]",
+        "ansible_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('ansible_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
+        "ansible_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('ansible_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
+        "ansible_pub_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('ansible_vm_name'),'_pub_nic_',variables('resourceGroupUniqueString'))]",
         "ansible_ssl_copy_sh": "[concat(parameters('_artifactsLocation'),'scripts/ansible_ssl.sh', variables('_artifactsLocationSasToken'))]",
         "ansible_startup_script_sh": "[concat(parameters('_artifactsLocation'),'scripts/ansible_setup.sh', variables('_artifactsLocationSasToken'))]",
         "ansible_vm_name": "ansible",
         "ansible_vm_size": "Standard_DS2_v2",
-        "cascontroller_nw_interface": "[concat(parameters('SAS Application Name'),'_',variables('cascontroller_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
-        "cascontroller_nw_sg": "[concat(parameters('SAS Application Name'),'_',variables('cascontroller_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
+        "cascontroller_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('cascontroller_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
+        "cascontroller_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('cascontroller_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
         "Cascontroller_vm_name": "cascontroller",
-        "casworker_nw_sg": "[concat(parameters('SAS Application Name'),'_',variables('casworker_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
+        "casworker_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('casworker_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
         "casworker_vm_name": "casworker",
         "certificatesPermissions": [
             "import",
@@ -273,8 +280,8 @@
         ],
         "custom_data_cas": "#cloud-config\n mounts:\n   - [ ephemeral0, /cascache]",
         "custom_data_sas": "#cloud-config\n mounts:\n   - [ ephemeral0, /saswork]",
-        "diagnostic_storagegroup_name": "[toLower(concat(parameters('SAS Application Name'),'diag', variables('resourceGroupUniqueString')))]",
-        "disk_size_10": "[div(parameters('SAS94 Lustre Data Storage'), 10)]",
+        "diagnostic_storagegroup_name": "[toLower(concat(parameters('SASApplicationName'),'diag', variables('resourceGroupUniqueString')))]",
+        "disk_size_10": "[div(parameters('SASLustreDataStorage'), 10)]",
         "domain_name": "internal.cloudapp.net",
         "enabledForDeployment": true,
         "enabledForDiskEncryption": false,
@@ -284,12 +291,12 @@
         "grid_binary_copy_sh": "[concat(parameters('_artifactsLocation'),'scripts/grid_sas_home_copy.sh', variables('_artifactsLocationSasToken'))]",
         "grid_config_sh": "[concat(parameters('_artifactsLocation'),'scripts/grid_config.sh', variables('_artifactsLocationSasToken'))]",
         "grid_install_sh": "[concat(parameters('_artifactsLocation'),'scripts/grid_install.sh', variables('_artifactsLocationSasToken'))]",
-        "grid_nw_interface": "[concat(parameters('SAS Application Name'),'_',variables('grid_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
-        "grid_nw_sg": "[concat(parameters('SAS Application Name'),'_',variables('grid_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
+        "grid_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('grid_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
+        "grid_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('grid_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
         "grid_vm_name": "grid",
-        "gridnode_nw_sg": "[concat(parameters('SAS Application Name'),'_',variables('gridnode_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
+        "gridnode_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('gridnode_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
         "gridnode_vm_name": "gridnode",
-        "key_vault_name": "[concat(parameters('SAS Application Name'), 'kv-',variables('resourceGroupUniqueString'))]",
+        "key_vault_name": "[concat(parameters('SASApplicationName'), 'kv-',variables('resourceGroupUniqueString'))]",
         "key_vault_secretname_pubkey": "ansible-pubkey",
         "key_vault_secretname_pvtkey": "ansible-pvtkey",
         "key_vault_secretname_sasext": "sasextpw",
@@ -303,38 +310,38 @@
         "linux_extension_template": "[concat(parameters('_artifactsLocation'),'nestedtemplates/vm_linux_extension.json', variables('_artifactsLocationSasToken'))]",
         "lustre_pre_install_sh": "[concat(parameters('_artifactsLocation'),'scripts/lustre_pre_install.sh', variables('_artifactsLocationSasToken'))]",
         "LustreVmSize": "Standard_F4s_v2",
-        "mdt_nw_interface": "[concat(parameters('SAS Application Name'),'_',variables('mdt_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
-        "mdt_nw_sg": "[concat(parameters('SAS Application Name'),'_',variables('mdt_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
+        "mdt_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('mdt_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
+        "mdt_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('mdt_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
         "mdt_pkg_install_sh": "[concat(parameters('_artifactsLocation'),'scripts/mdt_pkg_install.sh', variables('_artifactsLocationSasToken'))]",
         "mdt_vm_name": "mdt",
         "meta_config_sh": "[concat(parameters('_artifactsLocation'),'scripts/meta_config.sh', variables('_artifactsLocationSasToken'))]",
         "meta_install_sh": "[concat(parameters('_artifactsLocation'),'scripts/meta_install.sh', variables('_artifactsLocationSasToken'))]",
-        "meta_nw_interface": "[concat(parameters('SAS Application Name'),'_',variables('meta_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
-        "meta_nw_sg": "[concat(parameters('SAS Application Name'),'_',variables('meta_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
+        "meta_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('meta_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
+        "meta_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('meta_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
         "meta_vm_name": "meta",
-        "mgt_nw_interface": "[concat(parameters('SAS Application Name'),'_',variables('mgt_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
-        "mgt_nw_sg": "[concat(parameters('SAS Application Name'),'_',variables('mgt_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
+        "mgt_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('mgt_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
+        "mgt_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('mgt_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
         "mgt_pkg_install_sh": "[concat(parameters('_artifactsLocation'),'scripts/mgt_pkg_install.sh', variables('_artifactsLocationSasToken'))]",
         "mgt_vm_name": "mgt",
         "mgt_wait_sh": "[concat(parameters('_artifactsLocation'),'scripts/mgt_wait.sh', variables('_artifactsLocationSasToken'))]",
-        "microservices_nw_interface": "[concat(parameters('SAS Application Name'),'_',variables('microservices_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
-        "microservices_nw_sg": "[concat(parameters('SAS Application Name'),'_',variables('microservices_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
+        "microservices_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('microservices_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
+        "microservices_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('microservices_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
         "microservices_vm_name": "microservices",
         "mid_config_sh": "[concat(parameters('_artifactsLocation'),'scripts/mid_config.sh', variables('_artifactsLocationSasToken'))]",
         "mid_install_sh": "[concat(parameters('_artifactsLocation'),'scripts/mid_install.sh', variables('_artifactsLocationSasToken'))]",
-        "mid_nw_interface": "[concat(parameters('SAS Application Name'),'_',variables('mid_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
-        "mid_nw_sg": "[concat(parameters('SAS Application Name'),'_',variables('mid_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
+        "mid_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('mid_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
+        "mid_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('mid_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
         "mid_vm_name": "mid",
         "oss_node_install_sh": "[concat(parameters('_artifactsLocation'),'scripts/oss_node_install.sh', variables('_artifactsLocationSasToken'))]",
-        "oss_nw_sg": "[concat(parameters('SAS Application Name'),'_',variables('oss_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
+        "oss_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('oss_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
         "oss_vm_name": "oss",
         "PrimaryUserName": "vmuser",
         "pss_install_master.sh": "[concat(parameters('_artifactsLocation'),'scripts/pss_install_master.sh', variables('_artifactsLocationSasToken'))]",
         "pss_install_node_sh": "[concat(parameters('_artifactsLocation'),'scripts/pss_install_nodes.sh', variables('_artifactsLocationSasToken'))]",
-        "pub_sub_nw_sg": "[concat(parameters('SAS Application Name'), '_subnt_pub1_nsg_',variables('resourceGroupUniqueString'))]",
-        "pvt_sub_nw_sg": "[concat(parameters('SAS Application Name'), '_subnt_pvt1_nsg_',variables('resourceGroupUniqueString'))]",
-        "rdp_nw_interface": "[concat(parameters('SAS Application Name'),'_',variables('rdp_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
-        "rdp_nw_sg": "[concat(parameters('SAS Application Name'),'_',variables('rdp_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
+        "pub_sub_nw_sg": "[concat(parameters('SASApplicationName'), '_subnt_pub1_nsg_',variables('resourceGroupUniqueString'))]",
+        "pvt_sub_nw_sg": "[concat(parameters('SASApplicationName'), '_subnt_pvt1_nsg_',variables('resourceGroupUniqueString'))]",
+        "rdp_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('rdp_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
+        "rdp_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('rdp_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
         "rdp_os_version": "2012-R2-Datacenter",
         "rdp_vm_name": "rdp",
         "rdp_vm_size": "Standard_DS2_v2",
@@ -354,30 +361,30 @@
             "set"
         ],
         "skuName": "standard",
-        "spre_nw_interface": "[concat(parameters('SAS Application Name'),'_',variables('spre_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
-        "spre_nw_sg": "[concat(parameters('SAS Application Name'),'_',variables('spre_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
+        "spre_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('spre_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
+        "spre_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('spre_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
         "spre_vm_name": "spre",
         "tenantId": "[subscription().tenantId]",
         "viya_ark_sh": "[concat(parameters('_artifactsLocation'),'scripts/viya_ark.sh', variables('_artifactsLocationSasToken'))]",
         "viya_install_sh": "[concat(parameters('_artifactsLocation'),'scripts/viyainstall.sh', variables('_artifactsLocationSasToken'))]",
         "viya_startup_script_sh": "[concat(parameters('_artifactsLocation'),'scripts/viya_prereq.sh', variables('_artifactsLocationSasToken'))]",
-        "vnet_lustre_pvt_subnt": "[concat(parameters('SAS Application Name'), '_vnet_pvt2_subnt_',variables('resourceGroupUniqueString'))]",
-        "vnet_name": "[concat(parameters('SAS Application Name'),'_vnet_',variables('resourceGroupUniqueString'))]",
-        "vnet_pub_subnt": "[concat(parameters('SAS Application Name'),'_vnet_pub1_subnt_',variables('resourceGroupUniqueString'))]",
-        "vnet_pvt_subnt": "[concat(parameters('SAS Application Name'), '_vnet_pvt1_subnt_',variables('resourceGroupUniqueString'))]",
-        "vnet_viya_pvt_subnt": "[concat(parameters('SAS Application Name'), '_vnet_pvt3_subnt_',variables('resourceGroupUniqueString'))]",
+        "vnet_lustre_pvt_subnt": "[concat(parameters('SASApplicationName'), '_vnet_pvt2_subnt_',variables('resourceGroupUniqueString'))]",
+        "vnet_name": "[concat(parameters('SASApplicationName'),'_vnet_',variables('resourceGroupUniqueString'))]",
+        "vnet_pub_subnt": "[concat(parameters('SASApplicationName'),'_vnet_pub1_subnt_',variables('resourceGroupUniqueString'))]",
+        "vnet_pvt_subnt": "[concat(parameters('SASApplicationName'), '_vnet_pvt1_subnt_',variables('resourceGroupUniqueString'))]",
+        "vnet_viya_pvt_subnt": "[concat(parameters('SASApplicationName'), '_vnet_pvt3_subnt_',variables('resourceGroupUniqueString'))]",
         "windows_extension_template": "[concat(parameters('_artifactsLocation'),'nestedtemplates/vm_windows_extension.json', variables('_artifactsLocationSasToken'))]",
-        "ppg_name": "[concat(parameters('SAS Application Name'),'_ppg_',variables('resourceGroupUniqueString'))]",
+        "ppg_name": "[concat(parameters('SASApplicationName'),'_ppg_',variables('resourceGroupUniqueString'))]",
         "sas94vm_tags": {
-            "Application": "[parameters('SAS Application Name')]",
+            "Application": "[parameters('SASApplicationName')]",
             "Component": "SAS94NonGrid"
         },
         "sasviyavm_tags": {
-            "Application": "[parameters('SAS Application Name')]",
+            "Application": "[parameters('SASApplicationName')]",
             "Component": "SASViya"
         },
         "lustrevm_tags": {
-            "Application": "[parameters('SAS Application Name')]",
+            "Application": "[parameters('SASApplicationName')]",
             "Component": "Lustre"
         }
     },
@@ -386,7 +393,7 @@
             "apiVersion": "2019-12-01",
             "type": "Microsoft.Compute/proximityPlacementGroups",
             "name": "[variables('ppg_name')]",
-            "location": "[parameters('Location')]"
+            "location": "[parameters('location')]"
         },
         {
             "type": "Microsoft.Network/virtualNetworks",
@@ -396,18 +403,18 @@
                 "[resourceId('Microsoft.Network/networkSecurityGroups',variables('pub_sub_nw_sg'))]",
                 "[resourceId('Microsoft.Network/networkSecurityGroups',variables('pvt_sub_nw_sg'))]"
             ],
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "properties": {
                 "addressSpace": {
                     "addressPrefixes": [
-                        "[parameters('Vnet Address CIDR')]"
+                        "[parameters('vnetAddressCIDR')]"
                     ]
                 },
                 "subnets": [
                     {
                         "name": "[variables('vnet_pvt_subnt')]",
                         "properties": {
-                            "addressPrefix": "[parameters('SAS94 PrivateSubnet CIDR')]",
+                            "addressPrefix": "[parameters('SASGridPrivateSubnetCIDR')]",
                             "networkSecurityGroup": {
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('pvt_sub_nw_sg'))]"
                             }
@@ -416,7 +423,7 @@
                     {
                         "name": "[variables('vnet_lustre_pvt_subnt')]",
                         "properties": {
-                            "addressPrefix": "[parameters('Lustre PrivateSubnet CIDR')]",
+                            "addressPrefix": "[parameters('lustrePrivateSubnetCIDR')]",
                             "networkSecurityGroup": {
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('pvt_sub_nw_sg'))]"
                             }
@@ -425,7 +432,7 @@
                     {
                         "name": "[variables('vnet_viya_pvt_subnt')]",
                         "properties": {
-                            "addressPrefix": "[parameters('Viya PrivateSubnet CIDR')]",
+                            "addressPrefix": "[parameters('viyaPrivateSubnetCIDR')]",
                             "networkSecurityGroup": {
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('pvt_sub_nw_sg'))]"
                             }
@@ -434,7 +441,7 @@
                     {
                         "name": "[variables('vnet_pub_subnt')]",
                         "properties": {
-                            "addressPrefix": "[parameters('Ansible-Bastion PublicSubnet CIDR')]",
+                            "addressPrefix": "[parameters('ansibleBastionPublicSubnetCIDR')]",
                             "networkSecurityGroup": {
                                 "id": "[resourceId('Microsoft.Network/networkSecurityGroups', variables('pub_sub_nw_sg'))]"
                             }
@@ -449,7 +456,7 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2019-09-01",
             "name": "[variables('pub_sub_nw_sg')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "properties": {
                 "securityRules": [
                     {
@@ -458,7 +465,7 @@
                             "protocol": "TCP",
                             "sourcePortRange": "*",
                             "destinationPortRange": "22",
-                            "sourceAddressPrefix": "[parameters('Admin Ingress Location')]",
+                            "sourceAddressPrefix": "[parameters('adminIngresslocation')]",
                             "destinationAddressPrefix": "*",
                             "access": "Allow",
                             "priority": 1000,
@@ -544,7 +551,7 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2019-09-01",
             "name": "[variables('pvt_sub_nw_sg')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "properties": {
                 "defaultSecurityRules": [
                     {
@@ -624,7 +631,7 @@
             "type": "Microsoft.KeyVault/vaults",
             "name": "[variables('key_vault_name')]",
             "apiVersion": "2019-09-01",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "properties": {
                 "enabledForDeployment": "[variables('enabledForDeployment')]",
                 "enabledForDiskEncryption": "[variables('enabledForDiskEncryption')]",
@@ -633,7 +640,7 @@
                 "tenantId": "[variables('tenantId')]",
                 "accessPolicies": [
                     {
-                        "objectId": "[parameters('KeyVault Owner ID')]",
+                        "objectId": "[parameters('KeyVaultOwnerID')]",
                         "tenantId": "[variables('tenantId')]",
                         "permissions": {
                             "keys": "[variables('keysPermissions')]",
@@ -655,43 +662,43 @@
             "type": "Microsoft.KeyVault/vaults/secrets",
             "name": "[concat(variables('key_vault_name'), '/', variables('key_vault_secretname_sasinst'))]",
             "apiVersion": "2019-09-01",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.KeyVault/vaults', variables('key_vault_name'))]"
             ],
             "properties": {
-                "value": "[parameters('SAS Internal Password')]"
+                "value": "[parameters('SASInternalPassword')]"
             }
         },
         {
             "type": "Microsoft.KeyVault/vaults/secrets",
             "name": "[concat(variables('key_vault_name'), '/', variables('key_vault_secretname_sasext'))]",
             "apiVersion": "2019-09-01",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.KeyVault/vaults', variables('key_vault_name'))]"
             ],
             "properties": {
-                "value": "[parameters('SAS External Password')]"
+                "value": "[parameters('SASExternalPassword')]"
             }
         },
         {
             "type": "Microsoft.KeyVault/vaults/secrets",
             "apiVersion": "2019-09-01",
             "name": "[concat(variables('key_vault_name'), '/', variables('key_vault_secretname_stgacc'))]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.KeyVault/vaults', variables('key_vault_name'))]"
             ],
             "properties": {
-                "value": "[parameters('Storage Account Key')]"
+                "value": "[parameters('storageAccountKey')]"
             }
         },
         {
             "type": "Microsoft.Storage/storageAccounts",
             "apiVersion": "2019-04-01",
             "name": "[variables('diagnostic_storagegroup_name')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "sku": {
                 "name": "Standard_LRS",
                 "tier": "Standard"
@@ -720,7 +727,7 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2019-09-01",
             "name": "[variables('ansible_nw_sg')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "properties": {
                 "securityRules": [
                     {
@@ -729,7 +736,7 @@
                             "protocol": "TCP",
                             "sourcePortRange": "*",
                             "destinationPortRange": "22",
-                            "sourceAddressPrefix": "[parameters('Admin Ingress Location')]",
+                            "sourceAddressPrefix": "[parameters('adminIngresslocation')]",
                             "destinationAddressPrefix": "*",
                             "access": "Allow",
                             "priority": 1000,
@@ -815,7 +822,7 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2019-09-01",
             "name": "[variables('microservices_nw_sg')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "properties": {
                 "defaultSecurityRules": [
                     {
@@ -895,7 +902,7 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2019-09-01",
             "name": "[variables('spre_nw_sg')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "properties": {
                 "defaultSecurityRules": [
                     {
@@ -975,7 +982,7 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2019-09-01",
             "name": "[variables('cascontroller_nw_sg')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "properties": {
                 "defaultSecurityRules": [
                     {
@@ -1055,7 +1062,7 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2019-09-01",
             "name": "[variables('casworker_nw_sg')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "properties": {
                 "defaultSecurityRules": [
                     {
@@ -1134,7 +1141,7 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2019-09-01",
             "name": "[variables('meta_nw_sg')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "properties": {
                 "defaultSecurityRules": [
                     {
@@ -1213,7 +1220,7 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2019-09-01",
             "name": "[variables('mid_nw_sg')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "properties": {
                 "defaultSecurityRules": [
                     {
@@ -1292,7 +1299,7 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2019-09-01",
             "name": "[variables('gridnode_nw_sg')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "properties": {
                 "defaultSecurityRules": [
                     {
@@ -1371,7 +1378,7 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2019-09-01",
             "name": "[variables('mgt_nw_sg')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "properties": {
                 "defaultSecurityRules": [
                     {
@@ -1450,7 +1457,7 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2019-09-01",
             "name": "[variables('mdt_nw_sg')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "properties": {
                 "defaultSecurityRules": [
                     {
@@ -1529,7 +1536,7 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2019-09-01",
             "name": "[variables('oss_nw_sg')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "properties": {
                 "defaultSecurityRules": [
                     {
@@ -1608,7 +1615,7 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2019-09-01",
             "name": "[variables('grid_nw_sg')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "properties": {
                 "defaultSecurityRules": [
                     {
@@ -1687,7 +1694,7 @@
             "type": "Microsoft.Network/networkSecurityGroups",
             "apiVersion": "2019-09-01",
             "name": "[variables('rdp_nw_sg')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "properties": {
                 "defaultSecurityRules": [
                     {
@@ -1767,7 +1774,7 @@
             "type": "Microsoft.Network/publicIPAddresses",
             "apiVersion": "2019-09-01",
             "name": "[variables('ansible_pub_nw_interface')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "sku": {
                 "name": "Basic",
                 "tier": "Regional"
@@ -1782,7 +1789,7 @@
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2019-09-01",
             "name": "[variables('ansible_nw_interface')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/publicIPAddresses', variables('ansible_pub_nw_interface'))]",
                 "[resourceId('Microsoft.Network/networkSecurityGroups', variables('ansible_nw_sg'))]",
@@ -1815,7 +1822,7 @@
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2019-07-01",
             "name": "[variables('ansible_vm_name')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "identity": {
                 "type": "SystemAssigned"
             },
@@ -1963,13 +1970,13 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('ansible_vm_name')]"
                     },
                     "commandToExecute": {
-                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./ansible_setup.sh',' ',parameters('Storage Account Name'),' ',variables('key_vault_secretname_stgacc'),' ',parameters('File Share Name'),' ',parameters('Viyarepo Folder'),' ',parameters('SAS Application Name'),' ',variables('domain_name'),' ',variables('ansible_vm_name'),' ',variables('microservices_vm_name'),' ',variables('cascontroller_vm_name'),' ',variables('spre_vm_name'),' ',variables('casworker_vm_name'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',parameters('Number Of Viya CAS Nodes'),' ',variables('mid_vm_name'),' ',parameters('_artifactsLocation'),' ',variables('grid_vm_name'),' ',variables('meta_vm_name'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
+                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./ansible_setup.sh',' ',parameters('storageAccountName'),' ',variables('key_vault_secretname_stgacc'),' ',parameters('fileShareName'),' ',parameters('viyaRepoFolder'),' ',parameters('SASApplicationName'),' ',variables('domain_name'),' ',variables('ansible_vm_name'),' ',variables('microservices_vm_name'),' ',variables('cascontroller_vm_name'),' ',variables('spre_vm_name'),' ',variables('casworker_vm_name'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',parameters('numberOfViyaCASNodes'),' ',variables('mid_vm_name'),' ',parameters('_artifactsLocation'),' ',variables('grid_vm_name'),' ',variables('meta_vm_name'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
                     },
                     "_artifactsLocation": {
                         "value": "[variables('ansible_startup_script_sh')]"
@@ -1997,7 +2004,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('ansible_vm_name')]"
@@ -2032,7 +2039,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('ansible_vm_name')]"
@@ -2063,7 +2070,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('ansible_vm_name')]"
@@ -2094,7 +2101,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('ansible_vm_name')]"
@@ -2125,7 +2132,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('ansible_vm_name')]"
@@ -2146,7 +2153,7 @@
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2019-09-01",
             "name": "[variables('rdp_nw_interface')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups',variables('rdp_nw_sg'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks',variables('vnet_name'))]"
@@ -2175,7 +2182,7 @@
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2019-07-01",
             "name": "[variables('rdp_vm_name')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "identity": {
                 "type": "SystemAssigned"
             },
@@ -2201,7 +2208,7 @@
                 "osProfile": {
                     "computerName": "[variables('rdp_vm_name')]",
                     "adminUsername": "[variables('PrimaryUserName')]",
-                    "adminPassword": "[parameters('SAS External Password')]"
+                    "adminPassword": "[parameters('SASExternalPassword')]"
                 },
                 "networkProfile": {
                     "networkInterfaces": [
@@ -2237,13 +2244,13 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('rdp_vm_name')]"
                     },
                     "commandToExecute": {
-                        "value": "[concat('powershell -ExecutionPolicy Unrestricted -File sas_clients_install.ps1 ','-stg_acc_name ',parameters('Storage Account Name'),' -stg_key ',parameters('Storage Account Key'),' -file_share_name ',parameters('File Share Name'),' -depot_folder_name ',parameters('SASDepot Folder'),' -clients_sid ',parameters('SAS94 Server license file'),' -app_name ',parameters('SAS Application Name'),' -mid_name ',variables('mid_vm_name'),' -domain_name ',variables('domain_name'),' -artifact_loc ',parameters('_artifactsLocation'))]"
+                        "value": "[concat('powershell -ExecutionPolicy Unrestricted -File sas_clients_install.ps1 ','-stg_acc_name ',parameters('storageAccountName'),' -stg_key ',parameters('storageAccountKey'),' -file_share_name ',parameters('fileShareName'),' -depot_folder_name ',parameters('SASDepotFolder'),' -clients_sid ',parameters('SASServerLicenseFile'),' -app_name ',parameters('SASApplicationName'),' -mid_name ',variables('mid_vm_name'),' -domain_name ',variables('domain_name'),' -artifact_loc ',parameters('_artifactsLocation'))]"
                     },
                     "_artifactsLocation": {
                         "value": "[variables('sasclients_power_shell_script')]"
@@ -2258,7 +2265,7 @@
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2019-09-01",
             "name": "[variables('meta_nw_interface')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups', variables('meta_nw_sg'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks',variables('vnet_name'))]"
@@ -2287,7 +2294,7 @@
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2019-07-01",
             "name": "[variables('meta_vm_name')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "tags": "[variables('sas94vm_tags')]",
             "identity": {
                 "type": "SystemAssigned"
@@ -2298,7 +2305,7 @@
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[parameters('SAS94 Meta VM Size')]"
+                    "vmSize": "[parameters('SASGridMetaVmSize')]"
                 },
                 "storageProfile": {
                     "imageReference": {
@@ -2435,13 +2442,13 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('meta_vm_name')]"
                     },
                     "commandToExecute": {
-                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./sasappgrid_prereq.sh',' ',parameters('SAS Application Name'),' ',parameters('SASDepot Folder'),' ',parameters('File Share Name'),' ',parameters('Storage Account Name'),' ',variables('domain_name'),' ',parameters('Location'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',variables('mid_vm_name'),' ',variables('meta_vm_name'),' ',variables('grid_vm_name'),' ',parameters('SAS94 Server license file'),' ',parameters('SAS94 Grid license file'),' ',parameters('SAS LSF license file'),' ',variables('key_vault_secretname_stgacc'),' ','meta',' ',parameters('_artifactsLocation'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
+                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./sasappgrid_prereq.sh',' ',parameters('SASApplicationName'),' ',parameters('SASDepotFolder'),' ',parameters('fileShareName'),' ',parameters('storageAccountName'),' ',variables('domain_name'),' ',parameters('location'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',variables('mid_vm_name'),' ',variables('meta_vm_name'),' ',variables('grid_vm_name'),' ',parameters('SASServerLicenseFile'),' ',parameters('SASGridLicenseFile'),' ',parameters('SASLsfLicenseFile'),' ',variables('key_vault_secretname_stgacc'),' ','meta',' ',parameters('_artifactsLocation'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
                     },
                     "_artifactsLocation": {
                         "value": "[variables('sasgrid_prereq_sh')]"
@@ -2468,7 +2475,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('meta_vm_name')]"
@@ -2501,7 +2508,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('meta_vm_name')]"
@@ -2522,7 +2529,7 @@
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2019-09-01",
             "name": "[variables('grid_nw_interface')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups', variables('grid_nw_sg'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks',variables('vnet_name'))]"
@@ -2551,7 +2558,7 @@
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2019-07-01",
             "name": "[variables('grid_vm_name')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "tags": "[variables('sas94vm_tags')]",
             "identity": {
                 "type": "SystemAssigned"
@@ -2562,7 +2569,7 @@
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[parameters('SAS94 Grid VM Size')]"
+                    "vmSize": "[parameters('SASGridControllerVmSize')]"
                 },
                 "storageProfile": {
                     "imageReference": {
@@ -2700,13 +2707,13 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('grid_vm_name')]"
                     },
                     "commandToExecute": {
-                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./sasappgrid_prereq.sh',' ',parameters('SAS Application Name'),' ',parameters('SASDepot Folder'),' ',parameters('File Share Name'),' ',parameters('Storage Account Name'),' ',variables('domain_name'),' ',parameters('Location'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',variables('mid_vm_name'),' ',variables('meta_vm_name'),' ',variables('grid_vm_name'),' ',parameters('SAS94 Server license file'),' ',parameters('SAS94 Grid license file'),' ',parameters('SAS LSF license file'),' ',variables('key_vault_secretname_stgacc'),' ','grid',' ',parameters('_artifactsLocation'),' ',parameters('Number of SAS94 Grid Nodes'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
+                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./sasappgrid_prereq.sh',' ',parameters('SASApplicationName'),' ',parameters('SASDepotFolder'),' ',parameters('fileShareName'),' ',parameters('storageAccountName'),' ',variables('domain_name'),' ',parameters('location'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',variables('mid_vm_name'),' ',variables('meta_vm_name'),' ',variables('grid_vm_name'),' ',parameters('SASServerLicenseFile'),' ',parameters('SASGridLicenseFile'),' ',parameters('SASLsfLicenseFile'),' ',variables('key_vault_secretname_stgacc'),' ','grid',' ',parameters('_artifactsLocation'),' ',parameters('numberOfSASGridNodes'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
                     },
                     "_artifactsLocation": {
                         "value": "[variables('sasgrid_prereq_sh')]"
@@ -2733,7 +2740,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('grid_vm_name')]"
@@ -2765,7 +2772,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('grid_vm_name')]"
@@ -2796,7 +2803,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('grid_vm_name')]"
@@ -2828,7 +2835,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('grid_vm_name')]"
@@ -2860,7 +2867,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('grid_vm_name')]"
@@ -2881,7 +2888,7 @@
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2019-09-01",
             "name": "[variables('mid_nw_interface')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups', variables('mid_nw_sg'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks',variables('vnet_name'))]"
@@ -2910,7 +2917,7 @@
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2019-07-01",
             "name": "[variables('mid_vm_name')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "tags": "[variables('sas94vm_tags')]",
             "identity": {
                 "type": "SystemAssigned"
@@ -2921,7 +2928,7 @@
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[parameters('SAS94 Mid VM Size')]"
+                    "vmSize": "[parameters('SASGridMidVmSize')]"
                 },
                 "storageProfile": {
                     "imageReference": {
@@ -3058,13 +3065,13 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('mid_vm_name')]"
                     },
                     "commandToExecute": {
-                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./sasappgrid_prereq.sh',' ',parameters('SAS Application Name'),' ',parameters('SASDepot Folder'),' ',parameters('File Share Name'),' ',parameters('Storage Account Name'),' ',variables('domain_name'),' ',parameters('Location'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',variables('mid_vm_name'),' ',variables('meta_vm_name'),' ',variables('grid_vm_name'),' ',parameters('SAS94 Server license file'),' ',parameters('SAS94 Grid license file'),' ',parameters('SAS LSF license file'),' ',variables('key_vault_secretname_stgacc'),' ','mid',' ',parameters('_artifactsLocation'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
+                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./sasappgrid_prereq.sh',' ',parameters('SASApplicationName'),' ',parameters('SASDepotFolder'),' ',parameters('fileShareName'),' ',parameters('storageAccountName'),' ',variables('domain_name'),' ',parameters('location'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',variables('mid_vm_name'),' ',variables('meta_vm_name'),' ',variables('grid_vm_name'),' ',parameters('SASServerLicenseFile'),' ',parameters('SASGridLicenseFile'),' ',parameters('SASLsfLicenseFile'),' ',variables('key_vault_secretname_stgacc'),' ','mid',' ',parameters('_artifactsLocation'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
                     },
                     "_artifactsLocation": {
                         "value": "[variables('sasgrid_prereq_sh')]"
@@ -3092,7 +3099,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('mid_vm_name')]"
@@ -3125,7 +3132,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('mid_vm_name')]"
@@ -3145,12 +3152,12 @@
         {
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2019-09-01",
-            "name": "[concat(parameters('SAS Application Name'),'_',variables('gridnode_vm_name'), copyIndex(1),'_nic_',variables('resourceGroupUniqueString'))]",
+            "name": "[concat(parameters('SASApplicationName'),'_',variables('gridnode_vm_name'), copyIndex(1),'_nic_',variables('resourceGroupUniqueString'))]",
             "copy": {
                 "name": "sasnodeNICcopy",
-                "count": "[parameters('Number of SAS94 Grid Nodes')]"
+                "count": "[parameters('numberOfSASGridNodes')]"
             },
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups', variables('gridnode_nw_sg'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks',variables('vnet_name'))]"
@@ -3181,20 +3188,20 @@
             "name": "[concat(variables('gridnode_vm_name'), copyIndex(1))]",
             "copy": {
                 "name": "sasnodecopy",
-                "count": "[parameters('Number of SAS94 Grid Nodes')]"
+                "count": "[parameters('numberOfSASGridNodes')]"
             },
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "tags": "[variables('sas94vm_tags')]",
             "identity": {
                 "type": "SystemAssigned"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('SAS Application Name'),'_',variables('gridnode_vm_name'), copyIndex(1),'_nic_',variables('resourceGroupUniqueString')))]",
+                "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('SASApplicationName'),'_',variables('gridnode_vm_name'), copyIndex(1),'_nic_',variables('resourceGroupUniqueString')))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('diagnostic_storagegroup_name'))]"
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[parameters('SAS94 Grid Node VM Size')]"
+                    "vmSize": "[parameters('SASGridNodeVmSize')]"
                 },
                 "storageProfile": {
                     "imageReference": {
@@ -3241,7 +3248,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('SAS Application Name'),'_',variables('gridnode_vm_name'), copyIndex(1),'_nic_',variables('resourceGroupUniqueString')))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('SASApplicationName'),'_',variables('gridnode_vm_name'), copyIndex(1),'_nic_',variables('resourceGroupUniqueString')))]"
                         }
                     ]
                 },
@@ -3263,7 +3270,7 @@
             "name": "[concat('GridNode-RoleAssignment', copyIndex(1))]",
             "copy": {
                 "name": "sasnodecopy",
-                "count": "[parameters('Number of SAS94 Grid Nodes')]"
+                "count": "[parameters('numberOfSASGridNodes')]"
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', concat(variables('gridnode_vm_name'), copyIndex(1)))]"
@@ -3294,7 +3301,7 @@
                 "mode": "serial",
                 "batchSize": 1,
                 "name": "sasgridnodecopy",
-                "count": "[parameters('Number of SAS94 Grid Nodes')]"
+                "count": "[parameters('numberOfSASGridNodes')]"
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', concat(variables('gridnode_vm_name'), copyIndex(1)))]",
@@ -3333,7 +3340,7 @@
             "name": "[concat('Phase1-GridNodeHostSetup', copyIndex(1))]",
             "copy": {
                 "name": "sasnodecopy",
-                "count": "[parameters('Number of SAS94 Grid Nodes')]"
+                "count": "[parameters('numberOfSASGridNodes')]"
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines',concat(variables('gridnode_vm_name'), copyIndex(1)))]",
@@ -3346,13 +3353,13 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[concat(variables('gridnode_vm_name'), copyIndex(1))]"
                     },
                     "commandToExecute": {
-                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./sasappgrid_prereq.sh',' ',parameters('SAS Application Name'),' ',parameters('SASDepot Folder'),' ',parameters('File Share Name'),' ',parameters('Storage Account Name'),' ',variables('domain_name'),' ',parameters('Location'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',variables('mid_vm_name'),' ',variables('meta_vm_name'),' ',variables('grid_vm_name'),' ',parameters('SAS94 Server license file'),' ',parameters('SAS94 Grid Node VM Size'),' ',parameters('SAS LSF license file'),' ',variables('key_vault_secretname_stgacc'),' ','gridnode',' ',parameters('_artifactsLocation'),' ',parameters('Number of SAS94 Grid Nodes'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
+                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./sasappgrid_prereq.sh',' ',parameters('SASApplicationName'),' ',parameters('SASDepotFolder'),' ',parameters('fileShareName'),' ',parameters('storageAccountName'),' ',variables('domain_name'),' ',parameters('location'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',variables('mid_vm_name'),' ',variables('meta_vm_name'),' ',variables('grid_vm_name'),' ',parameters('SASServerLicenseFile'),' ',parameters('SASGridNodeVmSize'),' ',parameters('SASLsfLicenseFile'),' ',variables('key_vault_secretname_stgacc'),' ','gridnode',' ',parameters('_artifactsLocation'),' ',parameters('numberOfSASGridNodes'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
                     },
                     "_artifactsLocation": {
                         "value": "[variables('sasgrid_prereq_sh')]"
@@ -3369,7 +3376,7 @@
             "name": "[concat('Phase2-GridNodePSSInstall', copyIndex(1))]",
             "copy": {
                 "name": "sasnodepsscopy",
-                "count": "[parameters('Number of SAS94 Grid Nodes')]"
+                "count": "[parameters('numberOfSASGridNodes')]"
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines',concat(variables('gridnode_vm_name'), copyIndex(1)))]",
@@ -3383,7 +3390,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[concat(variables('gridnode_vm_name'), copyIndex(1))]"
@@ -3406,7 +3413,7 @@
             "name": "[concat('Phase3-GridNodeEnvStartup', copyIndex(1))]",
             "copy": {
                 "name": "sasnodecopy",
-                "count": "[parameters('Number of SAS94 Grid Nodes')]"
+                "count": "[parameters('numberOfSASGridNodes')]"
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines',concat(variables('gridnode_vm_name'), copyIndex(1)))]",
@@ -3419,7 +3426,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[concat(variables('gridnode_vm_name'), copyIndex(1))]"
@@ -3440,7 +3447,7 @@
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2019-09-01",
             "name": "[variables('mgt_nw_interface')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups', variables('mgt_nw_sg'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks',variables('vnet_name'))]"
@@ -3469,7 +3476,7 @@
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2019-07-01",
             "name": "[variables('mgt_vm_name')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "tags": "[variables('lustrevm_tags')]",
             "identity": {
                 "type": "SystemAssigned"
@@ -3556,7 +3563,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('mgt_vm_name')]"
@@ -3589,7 +3596,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('ansible_vm_name')]"
@@ -3621,7 +3628,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('mgt_vm_name')]"
@@ -3642,7 +3649,7 @@
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2019-09-01",
             "name": "[variables('mdt_nw_interface')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups', variables('mdt_nw_sg'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks',variables('vnet_name'))]"
@@ -3671,7 +3678,7 @@
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2019-07-01",
             "name": "[variables('mdt_vm_name')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "tags": "[variables('lustrevm_tags')]",
             "identity": {
                 "type": "SystemAssigned"
@@ -3758,7 +3765,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('mdt_vm_name')]"
@@ -3790,7 +3797,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('mdt_vm_name')]"
@@ -3810,12 +3817,12 @@
         {
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2019-09-01",
-            "name": "[concat(parameters('SAS Application Name'),'_',variables('oss_vm_name'),copyIndex(1),'_nic_',variables('resourceGroupUniqueString'))]",
+            "name": "[concat(parameters('SASApplicationName'),'_',variables('oss_vm_name'),copyIndex(1),'_nic_',variables('resourceGroupUniqueString'))]",
             "copy": {
                 "name": "sasnodeNICcopy",
-                "count": "[parameters('Number of Lustre OSS Nodes')]"
+                "count": "[parameters('numberOfLustreOSSNodes')]"
             },
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups', variables('oss_nw_sg'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks',variables('vnet_name'))]"
@@ -3846,20 +3853,20 @@
             "name": "[concat(variables('oss_vm_name'), copyIndex(1))]",
             "copy": {
                 "name": "sasnodecopy",
-                "count": "[parameters('Number of Lustre OSS Nodes')]"
+                "count": "[parameters('numberOfLustreOSSNodes')]"
             },
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "tags": "[variables('lustrevm_tags')]",
             "identity": {
                 "type": "SystemAssigned"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('SAS Application Name'),'_',variables('oss_vm_name'),copyIndex(1),'_nic_',variables('resourceGroupUniqueString')))]",
+                "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('SASApplicationName'),'_',variables('oss_vm_name'),copyIndex(1),'_nic_',variables('resourceGroupUniqueString')))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('diagnostic_storagegroup_name'))]"
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[parameters('Lustre OSS Node VM Size')]"
+                    "vmSize": "[parameters('lustreOSSNodeVmSize')]"
                 },
                 "storageProfile": {
                     "imageReference": {
@@ -3989,7 +3996,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('SAS Application Name'),'_',variables('oss_vm_name'),copyIndex(1),'_nic_',variables('resourceGroupUniqueString')))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('SASApplicationName'),'_',variables('oss_vm_name'),copyIndex(1),'_nic_',variables('resourceGroupUniqueString')))]"
                         }
                     ]
                 },
@@ -4008,7 +4015,7 @@
             "name": "[concat('Phase1-OSSHostSetup', copyIndex(1))]",
             "copy": {
                 "name": "sasnodecopy",
-                "count": "[parameters('Number of Lustre OSS Nodes')]"
+                "count": "[parameters('numberOfLustreOSSNodes')]"
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', concat(variables('oss_vm_name'), copyIndex(1)))]"
@@ -4020,7 +4027,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[concat(variables('oss_vm_name'), copyIndex(1))]"
@@ -4043,7 +4050,7 @@
             "name": "[concat('Phase2-OSS-Install', copyIndex(1))]",
             "copy": {
                 "name": "ossnodecopy",
-                "count": "[parameters('Number of Lustre OSS Nodes')]"
+                "count": "[parameters('numberOfLustreOSSNodes')]"
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines',concat(variables('oss_vm_name'), copyIndex(1)))]",
@@ -4058,7 +4065,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[concat(variables('oss_vm_name'), copyIndex(1))]"
@@ -4079,7 +4086,7 @@
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2019-09-01",
             "name": "[variables('microservices_nw_interface')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups', variables('microservices_nw_sg'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks',variables('vnet_name'))]"
@@ -4108,7 +4115,7 @@
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2019-07-01",
             "name": "[variables('microservices_vm_name')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "tags": "[variables('sasviyavm_tags')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces', variables('microservices_nw_interface'))]",
@@ -4119,7 +4126,7 @@
             },
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[parameters('Viya Microservices VM Size')]"
+                    "vmSize": "[parameters('viyaMicroservicesVmSize')]"
                 },
                 "storageProfile": {
                     "imageReference": {
@@ -4263,13 +4270,13 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('microservices_vm_name')]"
                     },
                     "commandToExecute": {
-                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./viya_prereq.sh',' ',parameters('Storage Account Name'),' ',parameters('File Share Name'),' ',parameters('Viyarepo Folder'),' ',parameters('SAS Application Name'),' ',variables('domain_name'),' ',variables('ansible_vm_name'),' ',variables('microservices_vm_name'),' ',variables('cascontroller_vm_name'),' ',variables('spre_vm_name'),' ',variables('casworker_vm_name'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',parameters('Number Of Viya CAS Nodes'),' ',parameters('_artifactsLocation'),' ',variables('key_vault_secretname_stgacc'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
+                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./viya_prereq.sh',' ',parameters('storageAccountName'),' ',parameters('fileShareName'),' ',parameters('viyaRepoFolder'),' ',parameters('SASApplicationName'),' ',variables('domain_name'),' ',variables('ansible_vm_name'),' ',variables('microservices_vm_name'),' ',variables('cascontroller_vm_name'),' ',variables('spre_vm_name'),' ',variables('casworker_vm_name'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',parameters('numberOfViyaCASNodes'),' ',parameters('_artifactsLocation'),' ',variables('key_vault_secretname_stgacc'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
                     },
                     "_artifactsLocation": {
                         "value": "[variables('viya_startup_script_sh')]"
@@ -4295,7 +4302,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('microservices_vm_name')]"
@@ -4316,7 +4323,7 @@
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2019-09-01",
             "name": "[variables('spre_nw_interface')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups', variables('spre_nw_sg'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks',variables('vnet_name'))]"
@@ -4345,7 +4352,7 @@
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2019-07-01",
             "name": "[variables('spre_vm_name')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "tags": "[variables('sasviyavm_tags')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces', variables('spre_nw_interface'))]",
@@ -4356,7 +4363,7 @@
             },
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[parameters('Viya SPRE VM Size')]"
+                    "vmSize": "[parameters('viyaSPREVmSize')]"
                 },
                 "storageProfile": {
                     "imageReference": {
@@ -4501,13 +4508,13 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('spre_vm_name')]"
                     },
                     "commandToExecute": {
-                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./viya_prereq.sh',' ',parameters('Storage Account Name'),' ',parameters('File Share Name'),' ',parameters('Viyarepo Folder'),' ',parameters('SAS Application Name'),' ',variables('domain_name'),' ',variables('ansible_vm_name'),' ',variables('microservices_vm_name'),' ',variables('cascontroller_vm_name'),' ',variables('spre_vm_name'),' ',variables('casworker_vm_name'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',parameters('Number Of Viya CAS Nodes'),' ',parameters('_artifactsLocation'),' ',variables('key_vault_secretname_stgacc'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
+                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./viya_prereq.sh',' ',parameters('storageAccountName'),' ',parameters('fileShareName'),' ',parameters('viyaRepoFolder'),' ',parameters('SASApplicationName'),' ',variables('domain_name'),' ',variables('ansible_vm_name'),' ',variables('microservices_vm_name'),' ',variables('cascontroller_vm_name'),' ',variables('spre_vm_name'),' ',variables('casworker_vm_name'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',parameters('numberOfViyaCASNodes'),' ',parameters('_artifactsLocation'),' ',variables('key_vault_secretname_stgacc'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
                     },
                     "_artifactsLocation": {
                         "value": "[variables('viya_startup_script_sh')]"
@@ -4533,7 +4540,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('spre_vm_name')]"
@@ -4554,7 +4561,7 @@
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2019-09-01",
             "name": "[variables('cascontroller_nw_interface')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups', variables('cascontroller_nw_sg'))]",
                 "[resourceId('Microsoft.Network/virtualNetworks',variables('vnet_name'))]"
@@ -4583,7 +4590,7 @@
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2019-07-01",
             "name": "[variables('Cascontroller_vm_name')]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "tags": "[variables('sasviyavm_tags')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces', variables('cascontroller_nw_interface'))]",
@@ -4594,7 +4601,7 @@
             },
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[parameters('Viya CAS Controller VM Size')]"
+                    "vmSize": "[parameters('viyaCASControllerVmSize')]"
                 },
                 "storageProfile": {
                     "imageReference": {
@@ -4628,7 +4635,7 @@
                         },
                         {
                             "name": "[concat(variables('cascontroller_vm_name'),'-sasdata')]",
-                            "diskSizeGB": "[parameters('SAS Viya Data Storage')]",
+                            "diskSizeGB": "[parameters('SASViyaDataStorage')]",
                             "lun": 2,
                             "createOption": "Empty"
                         }
@@ -4746,13 +4753,13 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('Cascontroller_vm_name')]"
                     },
                     "commandToExecute": {
-                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./viya_prereq.sh',' ',parameters('Storage Account Name'),' ',parameters('File Share Name'),' ',parameters('Viyarepo Folder'),' ',parameters('SAS Application Name'),' ',variables('domain_name'),' ',variables('ansible_vm_name'),' ',variables('microservices_vm_name'),' ',variables('cascontroller_vm_name'),' ',variables('spre_vm_name'),' ',variables('casworker_vm_name'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',parameters('Number Of Viya CAS Nodes'),' ',parameters('_artifactsLocation'),' ',variables('key_vault_secretname_stgacc'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
+                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./viya_prereq.sh',' ',parameters('storageAccountName'),' ',parameters('fileShareName'),' ',parameters('viyaRepoFolder'),' ',parameters('SASApplicationName'),' ',variables('domain_name'),' ',variables('ansible_vm_name'),' ',variables('microservices_vm_name'),' ',variables('cascontroller_vm_name'),' ',variables('spre_vm_name'),' ',variables('casworker_vm_name'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',parameters('numberOfViyaCASNodes'),' ',parameters('_artifactsLocation'),' ',variables('key_vault_secretname_stgacc'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
                     },
                     "_artifactsLocation": {
                         "value": "[variables('viya_startup_script_sh')]"
@@ -4778,7 +4785,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[variables('Cascontroller_vm_name')]"
@@ -4798,11 +4805,11 @@
         {
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2019-09-01",
-            "name": "[concat(parameters('SAS Application Name'),'_',variables('casworker_vm_name'),copyIndex(),'_nic_',variables('resourceGroupUniqueString'))]",
-            "location": "[parameters('Location')]",
+            "name": "[concat(parameters('SASApplicationName'),'_',variables('casworker_vm_name'),copyIndex(),'_nic_',variables('resourceGroupUniqueString'))]",
+            "location": "[parameters('location')]",
             "copy": {
                 "name": "casworkernicLoop",
-                "count": "[parameters('Number Of Viya CAS Nodes')]"
+                "count": "[parameters('numberOfViyaCASNodes')]"
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkSecurityGroups', variables('casworker_nw_sg'))]",
@@ -4832,11 +4839,11 @@
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2019-07-01",
             "name": "[concat(variables('casworker_vm_name'), copyIndex())]",
-            "location": "[parameters('Location')]",
+            "location": "[parameters('location')]",
             "tags": "[variables('sasviyavm_tags')]",
             "copy": {
                 "name": "casworkervmLoop",
-                "count": "[parameters('Number Of Viya CAS Nodes')]"
+                "count": "[parameters('numberOfViyaCASNodes')]"
             },
             "dependsOn": [
                 "casworkernicLoop",
@@ -4847,7 +4854,7 @@
             },
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[parameters('Viya CAS Worker VM Size')]"
+                    "vmSize": "[parameters('viyaCASWorkerVmSize')]"
                 },
                 "storageProfile": {
                     "imageReference": {
@@ -4900,7 +4907,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('SAS Application Name'),'_',variables('casworker_vm_name'),copyIndex(),'_nic_',variables('resourceGroupUniqueString')))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('SASApplicationName'),'_',variables('casworker_vm_name'),copyIndex(),'_nic_',variables('resourceGroupUniqueString')))]"
                         }
                     ]
                 },
@@ -4915,7 +4922,7 @@
             "name": "[concat(variables('casworker_vm_name'), copyIndex(),'roleassignment')]",
             "copy": {
                 "name": "casworkerrolecopy",
-                "count": "[parameters('Number Of Viya CAS Nodes')]"
+                "count": "[parameters('numberOfViyaCASNodes')]"
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', concat(variables('casworker_vm_name'), copyIndex()))]"
@@ -4946,7 +4953,7 @@
                 "mode": "serial",
                 "batchSize": 1,
                 "name": "casworkerpolicycopy",
-                "count": "[parameters('Number Of Viya CAS Nodes')]"
+                "count": "[parameters('numberOfViyaCASNodes')]"
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', concat(variables('casworker_vm_name'), copyIndex()))]",
@@ -4986,7 +4993,7 @@
             "name": "[concat('Phase1-',variables('casworker_vm_name'), copyIndex(),'Hostsetup')]",
             "copy": {
                 "name": "casworkerextensioncopy",
-                "count": "[parameters('Number Of Viya CAS Nodes')]"
+                "count": "[parameters('numberOfViyaCASNodes')]"
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', concat(variables('casworker_vm_name'), copyIndex()))]",
@@ -4999,13 +5006,13 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[concat(variables('casworker_vm_name'), copyIndex())]"
                     },
                     "commandToExecute": {
-                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./viya_prereq.sh',' ',parameters('Storage Account Name'),' ',parameters('File Share Name'),' ',parameters('Viyarepo Folder'),' ',parameters('SAS Application Name'),' ',variables('domain_name'),' ',variables('ansible_vm_name'),' ',variables('microservices_vm_name'),' ',variables('cascontroller_vm_name'),' ',variables('spre_vm_name'),' ',variables('casworker_vm_name'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',parameters('Number Of Viya CAS Nodes'),' ',parameters('_artifactsLocation'),' ',variables('key_vault_secretname_stgacc'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
+                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./viya_prereq.sh',' ',parameters('storageAccountName'),' ',parameters('fileShareName'),' ',parameters('viyaRepoFolder'),' ',parameters('SASApplicationName'),' ',variables('domain_name'),' ',variables('ansible_vm_name'),' ',variables('microservices_vm_name'),' ',variables('cascontroller_vm_name'),' ',variables('spre_vm_name'),' ',variables('casworker_vm_name'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',parameters('numberOfViyaCASNodes'),' ',parameters('_artifactsLocation'),' ',variables('key_vault_secretname_stgacc'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
                     },
                     "_artifactsLocation": {
                         "value": "[variables('viya_startup_script_sh')]"
@@ -5022,7 +5029,7 @@
             "name": "[concat('Phase2-',variables('casworker_vm_name'), copyIndex(),'ViyaARK')]",
             "copy": {
                 "name": "casworkerviyaarkcopy",
-                "count": "[parameters('Number Of Viya CAS Nodes')]"
+                "count": "[parameters('numberOfViyaCASNodes')]"
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', concat('Phase1-',variables('casworker_vm_name'), copyIndex(),'Hostsetup'))]",
@@ -5035,7 +5042,7 @@
                 },
                 "parameters": {
                     "location": {
-                        "value": "[parameters('Location')]"
+                        "value": "[parameters('location')]"
                     },
                     "vmName": {
                         "value": "[concat(variables('casworker_vm_name'), copyIndex())]"
@@ -5054,41 +5061,37 @@
         }
     ],
     "outputs": {
-        "Ansible-JumpHost Server IP": {
+        "ansibleJumpHostServerIP": {
             "value": "[concat(reference(resourceId('Microsoft.Compute/virtualMachines',variables('ansible_vm_name'))).osProfile.adminUsername,'@',reference(resourceId('Microsoft.Network/publicIPAddresses',variables('ansible_pub_nw_interface'))).IpAddress)]",
             "type": "string"
         },
-        "SAS RDP Server IP": {
+        "SASRdpServerIP": {
             "value": "[reference(resourceId('Microsoft.Network/networkInterfaces',variables('rdp_nw_interface'))).ipConfigurations[0].properties.privateIPAddress]",
             "type": "string"
         },
-        "SAS9 Logon": {
-            "value": "[concat('https://',parameters('SAS Application Name'),variables('mid_vm_name'),'.',variables('domain_name'),':8343/SASLogon')]",
+        "SASStudioMidTier": {
+            "value": "[concat('https://',parameters('SASApplicationName'),variables('mid_vm_name'),'.',variables('domain_name'),':8343/SASStudio')]",
             "type": "string"
         },
-        "SASStudio MidTier": {
-            "value": "[concat('https://',parameters('SAS Application Name'),variables('mid_vm_name'),'.',variables('domain_name'),':8343/SASStudio')]",
+        "SASGridManager": {
+            "value": "[concat('https://',parameters('SASApplicationName'),variables('mid_vm_name'),'.',variables('domain_name'),':8343/SASGridManager')]",
             "type": "string"
         },
-		"SAS9 Grid Manager": {
-            "value": "[concat('https://',parameters('SAS Application Name'),variables('mid_vm_name'),'.',variables('domain_name'),':8343/SASGridManager')]",
-            "type": "string"
-        },
-        "SAS9 Install User": {
+        "SASInstallUser": {
             "value": "sasinst",
             "type": "string"
         },
-        "Viya SASDrive": {
-            "value": "[concat('https://',parameters('SAS Application Name'),variables('microservices_vm_name'),'.',variables('domain_name'),'/SASDrive')]",
+        "viyaSASDrive": {
+            "value": "[concat('https://',parameters('SASApplicationName'),variables('microservices_vm_name'),'.',variables('domain_name'),'/SASDrive')]",
             "type": "string"
         },
-        "Viya SASStudio": {
-            "value": "[concat('https://',parameters('SAS Application Name'),variables('microservices_vm_name'),'.',variables('domain_name'),'/SASStudio')]",
+        "viyaSASStudio": {
+            "value": "[concat('https://',parameters('SASApplicationName'),variables('microservices_vm_name'),'.',variables('domain_name'),'/SASStudio')]",
             "type": "string"
         },
-        "Viya SAS Admin Password Reset URL": {
+        "viyaSasbootUser": {
             "type": "String",
-            "value": "[concat('https://',parameters('SAS Application Name'),variables('microservices_vm_name'),'.',variables('domain_name'),'/SASLogon/reset_password?code=',json(split(reference('Phase6-ViyaPostInstall').outputs.instanceView.value.statuses[0].message, '#SASBOOT#')[1]).SAS_BOOT)]"
+            "value": "[concat('https://',parameters('SASApplicationName'),variables('microservices_vm_name'),'.',variables('domain_name'),'/SASLogon/reset_password?code=',json(split(reference('Phase6-ViyaPostInstall').outputs.instanceView.value.statuses[0].message, '#SASBOOT#')[1]).SAS_BOOT)]"
         }
     }
 }
