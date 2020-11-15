@@ -259,19 +259,19 @@
         }
     },
     "variables": {
-        "access_policy_template": "[concat(parameters('_artifactsLocation'),'nestedtemplates/access_policy.json', variables('_artifactsLocationSasToken'))]",
-        "agent_startup_gridnodes_sh": "[concat(parameters('_artifactsLocation'),'scripts/agent_startup_gridnodes.sh', variables('_artifactsLocationSasToken'))]",
-        "ansible_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('ansible_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
-        "ansible_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('ansible_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
-        "ansible_pub_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('ansible_vm_name'),'_pub_nic_',variables('resourceGroupUniqueString'))]",
-        "ansible_ssl_copy_sh": "[concat(parameters('_artifactsLocation'),'scripts/ansible_ssl.sh', variables('_artifactsLocationSasToken'))]",
-        "ansible_startup_script_sh": "[concat(parameters('_artifactsLocation'),'scripts/ansible_setup.sh', variables('_artifactsLocationSasToken'))]",
+        "access_policy_template": "[concat(parameters('_artifactsLocation'),'nestedtemplates/access_policy.json', parameters('_artifactsLocationSasToken'))]",
+        "agent_startup_gridnodes_sh": "[concat(parameters('_artifactsLocation'),'scripts/agent_startup_gridnodes.sh', parameters('_artifactsLocationSasToken'))]",
+        "ansible_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('ansible_vm_name'),'_nic_')]",
+        "ansible_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('ansible_vm_name'),'_nsg')]",
+        "ansible_pub_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('ansible_vm_name'),'_public_nic')]",
+        "ansible_ssl_copy_sh": "[concat(parameters('_artifactsLocation'),'scripts/ansible_ssl.sh', parameters('_artifactsLocationSasToken'))]",
+        "ansible_startup_script_sh": "[concat(parameters('_artifactsLocation'),'scripts/ansible_setup.sh', parameters('_artifactsLocationSasToken'))]",
         "ansible_vm_name": "ansible",
         "ansible_vm_size": "Standard_DS2_v2",
-        "cascontroller_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('cascontroller_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
-        "cascontroller_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('cascontroller_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
+        "cascontroller_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('cascontroller_vm_name'),'_nic')]",
+        "cascontroller_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('cascontroller_vm_name'),'_nsg')]",
         "Cascontroller_vm_name": "cascontroller",
-        "casworker_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('casworker_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
+        "casworker_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('casworker_vm_name'),'_nsg')]",
         "casworker_vm_name": "casworker",
         "certificatesPermissions": [
             "import",
@@ -287,16 +287,16 @@
         "enabledForDiskEncryption": false,
         "enabledForTemplateDeployment": true,
         "enableSoftDelete": false,
-        "envmanager_setup_sh": "[concat(parameters('_artifactsLocation'),'scripts/envmanager_agents_setup.sh', variables('_artifactsLocationSasToken'))]",
-        "grid_binary_copy_sh": "[concat(parameters('_artifactsLocation'),'scripts/grid_sas_home_copy.sh', variables('_artifactsLocationSasToken'))]",
-        "grid_config_sh": "[concat(parameters('_artifactsLocation'),'scripts/grid_config.sh', variables('_artifactsLocationSasToken'))]",
-        "grid_install_sh": "[concat(parameters('_artifactsLocation'),'scripts/grid_install.sh', variables('_artifactsLocationSasToken'))]",
-        "grid_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('grid_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
-        "grid_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('grid_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
+        "envmanager_setup_sh": "[concat(parameters('_artifactsLocation'),'scripts/envmanager_agents_setup.sh', parameters('_artifactsLocationSasToken'))]",
+        "grid_binary_copy_sh": "[concat(parameters('_artifactsLocation'),'scripts/grid_sas_home_copy.sh', parameters('_artifactsLocationSasToken'))]",
+        "grid_config_sh": "[concat(parameters('_artifactsLocation'),'scripts/grid_config.sh', parameters('_artifactsLocationSasToken'))]",
+        "grid_install_sh": "[concat(parameters('_artifactsLocation'),'scripts/grid_install.sh', parameters('_artifactsLocationSasToken'))]",
+        "grid_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('grid_vm_name'),'_nic')]",
+        "grid_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('grid_vm_name'),'_nsg')]",
         "grid_vm_name": "grid",
-        "gridnode_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('gridnode_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
+        "gridnode_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('gridnode_vm_name'),'_nsg')]",
         "gridnode_vm_name": "gridnode",
-        "key_vault_name": "[concat(parameters('SASApplicationName'), 'kv-',variables('resourceGroupUniqueString'))]",
+        "key_vault_name": "[concat(parameters('SASApplicationName'), 'KeyVault')]",
         "key_vault_secretname_pubkey": "ansible-pubkey",
         "key_vault_secretname_pvtkey": "ansible-pvtkey",
         "key_vault_secretname_sasext": "sasextpw",
@@ -307,74 +307,74 @@
             "list",
             "import"
         ],
-        "linux_extension_template": "[concat(parameters('_artifactsLocation'),'nestedtemplates/vm_linux_extension.json', variables('_artifactsLocationSasToken'))]",
-        "lustre_pre_install_sh": "[concat(parameters('_artifactsLocation'),'scripts/lustre_pre_install.sh', variables('_artifactsLocationSasToken'))]",
+        "linux_extension_template": "[concat(parameters('_artifactsLocation'),'nestedtemplates/vm_linux_extension.json', parameters('_artifactsLocationSasToken'))]",
+        "lustre_pre_install_sh": "[concat(parameters('_artifactsLocation'),'scripts/lustre_pre_install.sh', parameters('_artifactsLocationSasToken'))]",
         "LustreVmSize": "Standard_F4s_v2",
-        "mdt_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('mdt_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
-        "mdt_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('mdt_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
-        "mdt_pkg_install_sh": "[concat(parameters('_artifactsLocation'),'scripts/mdt_pkg_install.sh', variables('_artifactsLocationSasToken'))]",
+        "mdt_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('mdt_vm_name'),'_nic')]",
+        "mdt_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('mdt_vm_name'),'_nsg')]",
+        "mdt_pkg_install_sh": "[concat(parameters('_artifactsLocation'),'scripts/mdt_pkg_install.sh', parameters('_artifactsLocationSasToken'))]",
         "mdt_vm_name": "mdt",
-        "meta_config_sh": "[concat(parameters('_artifactsLocation'),'scripts/meta_config.sh', variables('_artifactsLocationSasToken'))]",
-        "meta_install_sh": "[concat(parameters('_artifactsLocation'),'scripts/meta_install.sh', variables('_artifactsLocationSasToken'))]",
-        "meta_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('meta_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
-        "meta_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('meta_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
+        "meta_config_sh": "[concat(parameters('_artifactsLocation'),'scripts/meta_config.sh', parameters('_artifactsLocationSasToken'))]",
+        "meta_install_sh": "[concat(parameters('_artifactsLocation'),'scripts/meta_install.sh', parameters('_artifactsLocationSasToken'))]",
+        "meta_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('meta_vm_name'),'_nic')]",
+        "meta_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('meta_vm_name'),'_nsg')]",
         "meta_vm_name": "meta",
-        "mgt_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('mgt_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
-        "mgt_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('mgt_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
-        "mgt_pkg_install_sh": "[concat(parameters('_artifactsLocation'),'scripts/mgt_pkg_install.sh', variables('_artifactsLocationSasToken'))]",
+        "mgt_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('mgt_vm_name'),'_nic')]",
+        "mgt_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('mgt_vm_name'),'_nsg')]",
+        "mgt_pkg_install_sh": "[concat(parameters('_artifactsLocation'),'scripts/mgt_pkg_install.sh', parameters('_artifactsLocationSasToken'))]",
         "mgt_vm_name": "mgt",
-        "mgt_wait_sh": "[concat(parameters('_artifactsLocation'),'scripts/mgt_wait.sh', variables('_artifactsLocationSasToken'))]",
-        "microservices_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('microservices_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
-        "microservices_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('microservices_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
+        "mgt_wait_sh": "[concat(parameters('_artifactsLocation'),'scripts/mgt_wait.sh', parameters('_artifactsLocationSasToken'))]",
+        "microservices_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('microservices_vm_name'),'_nic')]",
+        "microservices_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('microservices_vm_name'),'_nsg')]",
         "microservices_vm_name": "microservices",
-        "mid_config_sh": "[concat(parameters('_artifactsLocation'),'scripts/mid_config.sh', variables('_artifactsLocationSasToken'))]",
-        "mid_install_sh": "[concat(parameters('_artifactsLocation'),'scripts/mid_install.sh', variables('_artifactsLocationSasToken'))]",
-        "mid_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('mid_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
-        "mid_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('mid_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
+        "mid_config_sh": "[concat(parameters('_artifactsLocation'),'scripts/mid_config.sh', parameters('_artifactsLocationSasToken'))]",
+        "mid_install_sh": "[concat(parameters('_artifactsLocation'),'scripts/mid_install.sh', parameters('_artifactsLocationSasToken'))]",
+        "mid_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('mid_vm_name'),'_nic')]",
+        "mid_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('mid_vm_name'),'_nsg')]",
         "mid_vm_name": "mid",
-        "oss_node_install_sh": "[concat(parameters('_artifactsLocation'),'scripts/oss_node_install.sh', variables('_artifactsLocationSasToken'))]",
-        "oss_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('oss_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
+        "oss_node_install_sh": "[concat(parameters('_artifactsLocation'),'scripts/oss_node_install.sh', parameters('_artifactsLocationSasToken'))]",
+        "oss_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('oss_vm_name'),'_nsg')]",
         "oss_vm_name": "oss",
         "PrimaryUserName": "vmuser",
-        "pss_install_master.sh": "[concat(parameters('_artifactsLocation'),'scripts/pss_install_master.sh', variables('_artifactsLocationSasToken'))]",
-        "pss_install_node_sh": "[concat(parameters('_artifactsLocation'),'scripts/pss_install_nodes.sh', variables('_artifactsLocationSasToken'))]",
-        "pub_sub_nw_sg": "[concat(parameters('SASApplicationName'), '_subnt_pub1_nsg_',variables('resourceGroupUniqueString'))]",
-        "pvt_sub_nw_sg": "[concat(parameters('SASApplicationName'), '_subnt_pvt1_nsg_',variables('resourceGroupUniqueString'))]",
-        "rdp_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('rdp_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
-        "rdp_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('rdp_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
+        "pss_install_master.sh": "[concat(parameters('_artifactsLocation'),'scripts/pss_install_master.sh', parameters('_artifactsLocationSasToken'))]",
+        "pss_install_node_sh": "[concat(parameters('_artifactsLocation'),'scripts/pss_install_nodes.sh', parameters('_artifactsLocationSasToken'))]",
+        "pub_sub_nw_sg": "[concat(parameters('SASApplicationName'), '_pub1_subnet_nsg')]",
+        "pvt_sub_nw_sg": "[concat(parameters('SASApplicationName'), '_pvt1_subnet_nsg')]",
+        "rdp_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('rdp_vm_name'),'_nic')]",
+        "rdp_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('rdp_vm_name'),'_nsg')]",
         "rdp_os_version": "2012-R2-Datacenter",
         "rdp_vm_name": "rdp",
         "rdp_vm_size": "Standard_DS2_v2",
         "reader_role": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
         "resourceGroupUniqueString": "[uniqueString(resourceGroup().id)]",
-        "role_assignment_template": "[concat(parameters('_artifactsLocation'),'nestedtemplates/role_assignments.json', variables('_artifactsLocationSasToken'))]",
+        "role_assignment_template": "[concat(parameters('_artifactsLocation'),'nestedtemplates/role_assignments.json', parameters('_artifactsLocationSasToken'))]",
         "sas_opt_sas_disk_size": 128,
         "sas_osdisk_size": 128,
         "sas_viya_backup_size": 100,
         "lustre_osdisk_size": 64,
         "lustre_opt_sas_disk_size": 128,
-        "sasclients_power_shell_script": "[concat(parameters('_artifactsLocation'),'scripts/sas_clients_install.ps1', variables('_artifactsLocationSasToken'))]",
-        "sasgrid_prereq_sh": "[concat(parameters('_artifactsLocation'),'scripts/sasappgrid_prereq.sh', variables('_artifactsLocationSasToken'))]",
+        "sasclients_power_shell_script": "[concat(parameters('_artifactsLocation'),'scripts/sas_clients_install.ps1', parameters('_artifactsLocationSasToken'))]",
+        "sasgrid_prereq_sh": "[concat(parameters('_artifactsLocation'),'scripts/sasappgrid_prereq.sh', parameters('_artifactsLocationSasToken'))]",
         "secretsPermissions": [
             "get",
             "list",
             "set"
         ],
         "skuName": "standard",
-        "spre_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('spre_vm_name'),'_nic_',variables('resourceGroupUniqueString'))]",
-        "spre_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('spre_vm_name'),'_nsg_',variables('resourceGroupUniqueString'))]",
+        "spre_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('spre_vm_name'),'_nic')]",
+        "spre_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('spre_vm_name'),'_nsg')]",
         "spre_vm_name": "spre",
         "tenantId": "[subscription().tenantId]",
-        "viya_ark_sh": "[concat(parameters('_artifactsLocation'),'scripts/viya_ark.sh', variables('_artifactsLocationSasToken'))]",
-        "viya_install_sh": "[concat(parameters('_artifactsLocation'),'scripts/viyainstall.sh', variables('_artifactsLocationSasToken'))]",
-        "viya_startup_script_sh": "[concat(parameters('_artifactsLocation'),'scripts/viya_prereq.sh', variables('_artifactsLocationSasToken'))]",
-        "vnet_lustre_pvt_subnt": "[concat(parameters('SASApplicationName'), '_vnet_pvt2_subnt_',variables('resourceGroupUniqueString'))]",
-        "vnet_name": "[concat(parameters('SASApplicationName'),'_vnet_',variables('resourceGroupUniqueString'))]",
-        "vnet_pub_subnt": "[concat(parameters('SASApplicationName'),'_vnet_pub1_subnt_',variables('resourceGroupUniqueString'))]",
-        "vnet_pvt_subnt": "[concat(parameters('SASApplicationName'), '_vnet_pvt1_subnt_',variables('resourceGroupUniqueString'))]",
-        "vnet_viya_pvt_subnt": "[concat(parameters('SASApplicationName'), '_vnet_pvt3_subnt_',variables('resourceGroupUniqueString'))]",
-        "windows_extension_template": "[concat(parameters('_artifactsLocation'),'nestedtemplates/vm_windows_extension.json', variables('_artifactsLocationSasToken'))]",
-        "ppg_name": "[concat(parameters('SASApplicationName'),'_ppg_',variables('resourceGroupUniqueString'))]",
+        "viya_ark_sh": "[concat(parameters('_artifactsLocation'),'scripts/viya_ark.sh', parameters('_artifactsLocationSasToken'))]",
+        "viya_install_sh": "[concat(parameters('_artifactsLocation'),'scripts/viyainstall.sh', parameters('_artifactsLocationSasToken'))]",
+        "viya_startup_script_sh": "[concat(parameters('_artifactsLocation'),'scripts/viya_prereq.sh', parameters('_artifactsLocationSasToken'))]",
+        "vnet_lustre_pvt_subnt": "[concat(parameters('SASApplicationName'), '_vnet_pvt2_subnet')]",
+        "vnet_name": "[concat(parameters('SASApplicationName'),'_vnet')]",
+        "vnet_pub_subnt": "[concat(parameters('SASApplicationName'),'_vnet_pub1_subnet')]",
+        "vnet_pvt_subnt": "[concat(parameters('SASApplicationName'), '_vnet_pvt1_subnet')]",
+        "vnet_viya_pvt_subnt": "[concat(parameters('SASApplicationName'), '_vnet_pvt3_subnet')]",
+        "windows_extension_template": "[concat(parameters('_artifactsLocation'),'nestedtemplates/vm_windows_extension.json', parameters('_artifactsLocationSasToken'))]",
+        "ppg_name": "[concat(parameters('SASApplicationName'),'_ppg')]",
         "sas94vm_tags": {
             "Application": "[parameters('SASApplicationName')]",
             "Component": "SAS94NonGrid"
@@ -1982,7 +1982,7 @@
                         "value": "[variables('ansible_startup_script_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -2016,7 +2016,7 @@
                         "value": "[variables('ansible_ssl_copy_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -2051,7 +2051,7 @@
                         "value": "[variables('viya_install_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -2082,7 +2082,7 @@
                         "value": "[variables('viya_install_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -2113,7 +2113,7 @@
                         "value": "[variables('viya_install_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -2144,7 +2144,7 @@
                         "value": "[variables('viya_install_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -2256,7 +2256,7 @@
                         "value": "[variables('sasclients_power_shell_script')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -2454,7 +2454,7 @@
                         "value": "[variables('sasgrid_prereq_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -2487,7 +2487,7 @@
                         "value": "[variables('meta_install_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -2520,7 +2520,7 @@
                         "value": "[variables('meta_config_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -2719,7 +2719,7 @@
                         "value": "[variables('sasgrid_prereq_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -2752,7 +2752,7 @@
                         "value": "[variables('pss_install_master.sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -2784,7 +2784,7 @@
                         "value": "[variables('grid_install_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -2815,7 +2815,7 @@
                         "value": "[variables('grid_binary_copy_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -2847,7 +2847,7 @@
                         "value": "[variables('grid_config_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -2879,7 +2879,7 @@
                         "value": "[variables('envmanager_setup_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -3077,7 +3077,7 @@
                         "value": "[variables('sasgrid_prereq_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -3111,7 +3111,7 @@
                         "value": "[variables('mid_install_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -3144,7 +3144,7 @@
                         "value": "[variables('mid_config_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -3152,7 +3152,7 @@
         {
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2019-09-01",
-            "name": "[concat(parameters('SASApplicationName'),'_',variables('gridnode_vm_name'), copyIndex(1),'_nic_',variables('resourceGroupUniqueString'))]",
+            "name": "[concat(parameters('SASApplicationName'),'_',variables('gridnode_vm_name'), copyIndex(1),'_nic')]",
             "copy": {
                 "name": "sasnodeNICcopy",
                 "count": "[parameters('numberOfSASGridNodes')]"
@@ -3196,7 +3196,7 @@
                 "type": "SystemAssigned"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('SASApplicationName'),'_',variables('gridnode_vm_name'), copyIndex(1),'_nic_',variables('resourceGroupUniqueString')))]",
+                "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('SASApplicationName'),'_',variables('gridnode_vm_name'), copyIndex(1),'_nic'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('diagnostic_storagegroup_name'))]"
             ],
             "properties": {
@@ -3248,7 +3248,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('SASApplicationName'),'_',variables('gridnode_vm_name'), copyIndex(1),'_nic_',variables('resourceGroupUniqueString')))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('SASApplicationName'),'_',variables('gridnode_vm_name'), copyIndex(1),'_nic'))]"
                         }
                     ]
                 },
@@ -3365,7 +3365,7 @@
                         "value": "[variables('sasgrid_prereq_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -3402,7 +3402,7 @@
                         "value": "[variables('pss_install_node_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -3438,7 +3438,7 @@
                         "value": "[variables('agent_startup_gridnodes_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -3575,7 +3575,7 @@
                         "value": "[variables('lustre_pre_install_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -3608,7 +3608,7 @@
                         "value": "[variables('mgt_wait_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -3640,7 +3640,7 @@
                         "value": "[variables('mgt_pkg_install_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -3777,7 +3777,7 @@
                         "value": "[variables('lustre_pre_install_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -3809,7 +3809,7 @@
                         "value": "[variables('mdt_pkg_install_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -3817,7 +3817,7 @@
         {
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2019-09-01",
-            "name": "[concat(parameters('SASApplicationName'),'_',variables('oss_vm_name'),copyIndex(1),'_nic_',variables('resourceGroupUniqueString'))]",
+            "name": "[concat(parameters('SASApplicationName'),'_',variables('oss_vm_name'),copyIndex(1),'_nic')]",
             "copy": {
                 "name": "sasnodeNICcopy",
                 "count": "[parameters('numberOfLustreOSSNodes')]"
@@ -3861,7 +3861,7 @@
                 "type": "SystemAssigned"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('SASApplicationName'),'_',variables('oss_vm_name'),copyIndex(1),'_nic_',variables('resourceGroupUniqueString')))]",
+                "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('SASApplicationName'),'_',variables('oss_vm_name'),copyIndex(1),'_nic'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('diagnostic_storagegroup_name'))]"
             ],
             "properties": {
@@ -3996,7 +3996,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('SASApplicationName'),'_',variables('oss_vm_name'),copyIndex(1),'_nic_',variables('resourceGroupUniqueString')))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('SASApplicationName'),'_',variables('oss_vm_name'),copyIndex(1),'_nic'))]"
                         }
                     ]
                 },
@@ -4039,7 +4039,7 @@
                         "value": "[variables('lustre_pre_install_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -4077,7 +4077,7 @@
                         "value": "[variables('oss_node_install_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -4282,7 +4282,7 @@
                         "value": "[variables('viya_startup_script_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -4314,7 +4314,7 @@
                         "value": "[variables('viya_ark_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -4520,7 +4520,7 @@
                         "value": "[variables('viya_startup_script_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -4552,7 +4552,7 @@
                         "value": "[variables('viya_ark_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -4765,7 +4765,7 @@
                         "value": "[variables('viya_startup_script_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -4797,7 +4797,7 @@
                         "value": "[variables('viya_ark_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -4805,7 +4805,7 @@
         {
             "type": "Microsoft.Network/networkInterfaces",
             "apiVersion": "2019-09-01",
-            "name": "[concat(parameters('SASApplicationName'),'_',variables('casworker_vm_name'),copyIndex(),'_nic_',variables('resourceGroupUniqueString'))]",
+            "name": "[concat(parameters('SASApplicationName'),'_',variables('casworker_vm_name'),copyIndex(),'_nic')]",
             "location": "[parameters('location')]",
             "copy": {
                 "name": "casworkernicLoop",
@@ -4907,7 +4907,7 @@
                 "networkProfile": {
                     "networkInterfaces": [
                         {
-                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('SASApplicationName'),'_',variables('casworker_vm_name'),copyIndex(),'_nic_',variables('resourceGroupUniqueString')))]"
+                            "id": "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('SASApplicationName'),'_',variables('casworker_vm_name'),copyIndex(),'_nic'))]"
                         }
                     ]
                 },
@@ -5018,7 +5018,7 @@
                         "value": "[variables('viya_startup_script_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
@@ -5054,7 +5054,7 @@
                         "value": "[variables('viya_ark_sh')]"
                     },
                     "_artifactsLocationSasToken": {
-                        "value": "[variables('_artifactsLocationSasToken')]"
+                        "value": "[parameters('_artifactsLocationSasToken')]"
                     }
                 }
             }
