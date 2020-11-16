@@ -351,6 +351,7 @@
         "ppg_name": "[concat(parameters('SASApplicationName'),'_ppg')]",
         "pub_sub_nw_sg": "[concat(parameters('SASApplicationName'), '_pub1_subnet_nsg')]",
         "pvt_sub_nw_sg": "[concat(parameters('SASApplicationName'), '_pvt1_subnet_nsg')]",
+        "rbacPrincipalID": "[parameters('keyVaultOwnerID')]",
         "rdp_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('rdp_vm_name'),'_nic')]",
         "rdp_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('rdp_vm_name'),'_nsg')]",
         "rdp_os_version": "2019-Datacenter",
@@ -1906,7 +1907,7 @@
                 },
                 "parameters": {
                     "roleAssignmentName": {
-                        "value": "[guid(variables('ansible_vm_name'),resourceGroup().id)]"
+                        "value": "[guid(resourceId('Microsoft.Compute/virtualMachines', variables('ansible_vm_name')), variables('reader_role'), variables('rbacPrincipalID'))]"
                     },
                     "roleDefinitionID": {
                         "value": "[variables('reader_role')]"
@@ -2312,7 +2313,6 @@
             "apiVersion": "2019-07-01",
             "name": "[variables('meta_vm_name')]",
             "location": "[parameters('location')]",
-            "tags": "[variables('sas94vm_tags')]",
             "identity": {
                 "type": "SystemAssigned"
             },
@@ -2320,6 +2320,7 @@
                 "[resourceId('Microsoft.Network/networkInterfaces', variables('meta_nw_interface'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('diagnostic_storagegroup_name'))]"
             ],
+            "tags": "[variables('sas94vm_tags')]",
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "[parameters('SASGridMetaVmSize')]"
@@ -2397,7 +2398,7 @@
                 },
                 "parameters": {
                     "roleAssignmentName": {
-                        "value": "[guid('Meta',resourceGroup().id)]"
+                        "value": "[guid(resourceId('Microsoft.Compute/virtualMachines', variables('meta_vm_name')), variables('reader_role'), variables('rbacPrincipalID'))]"
                     },
                     "roleDefinitionID": {
                         "value": "[variables('reader_role')]"
@@ -2584,7 +2585,6 @@
             "apiVersion": "2019-07-01",
             "name": "[variables('grid_vm_name')]",
             "location": "[parameters('location')]",
-            "tags": "[variables('sas94vm_tags')]",
             "identity": {
                 "type": "SystemAssigned"
             },
@@ -2592,6 +2592,7 @@
                 "[resourceId('Microsoft.Network/networkInterfaces', variables('grid_nw_interface'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('diagnostic_storagegroup_name'))]"
             ],
+            "tags": "[variables('sas94vm_tags')]",
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "[parameters('SASGridControllerVmSize')]"
@@ -2670,7 +2671,7 @@
                 },
                 "parameters": {
                     "roleAssignmentName": {
-                        "value": "[guid('Sasgrid',resourceGroup().id)]"
+                        "value": "[guid(resourceId('Microsoft.Compute/virtualMachines', variables('grid_vm_name')), variables('reader_role'), variables('rbacPrincipalID'))]"
                     },
                     "roleDefinitionID": {
                         "value": "[variables('reader_role')]"
@@ -2960,7 +2961,6 @@
             "apiVersion": "2019-07-01",
             "name": "[variables('mid_vm_name')]",
             "location": "[parameters('location')]",
-            "tags": "[variables('sas94vm_tags')]",
             "identity": {
                 "type": "SystemAssigned"
             },
@@ -2968,6 +2968,7 @@
                 "[resourceId('Microsoft.Network/networkInterfaces', variables('mid_nw_interface'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('diagnostic_storagegroup_name'))]"
             ],
+            "tags": "[variables('sas94vm_tags')]",
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "[parameters('SASGridMidVmSize')]"
@@ -3045,7 +3046,7 @@
                 },
                 "parameters": {
                     "roleAssignmentName": {
-                        "value": "[guid('Mid',resourceGroup().id)]"
+                        "value": "[guid(resourceId('Microsoft.Compute/virtualMachines', variables('mid_vm_name')), variables('reader_role'), variables('rbacPrincipalID'))]"
                     },
                     "roleDefinitionID": {
                         "value": "[variables('reader_role')]"
@@ -3236,19 +3237,19 @@
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2019-07-01",
             "name": "[concat(variables('gridnode_vm_name'), copyIndex(1))]",
+            "location": "[parameters('location')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
             "copy": {
                 "name": "sasnodecopy",
                 "count": "[parameters('numberOfSASGridNodes')]"
-            },
-            "location": "[parameters('location')]",
-            "tags": "[variables('sas94vm_tags')]",
-            "identity": {
-                "type": "SystemAssigned"
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('SASApplicationName'),'_',variables('gridnode_vm_name'), copyIndex(1),'_nic'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('diagnostic_storagegroup_name'))]"
             ],
+            "tags": "[variables('sas94vm_tags')]",
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "[parameters('SASGridNodeVmSize')]"
@@ -3331,7 +3332,7 @@
                 },
                 "parameters": {
                     "roleAssignmentName": {
-                        "value": "[guid(concat(variables('gridnode_vm_name'), copyIndex(1)),resourceGroup().id)]"
+                        "value": "[guid(resourceId('Microsoft.Compute/virtualMachines', concat(variables('gridnode_vm_name'), copyIndex(1))), variables('reader_role'), variables('rbacPrincipalID'))]"
                     },
                     "roleDefinitionID": {
                         "value": "[variables('reader_role')]"
@@ -3535,7 +3536,6 @@
             "apiVersion": "2019-07-01",
             "name": "[variables('mgt_vm_name')]",
             "location": "[parameters('location')]",
-            "tags": "[variables('lustrevm_tags')]",
             "identity": {
                 "type": "SystemAssigned"
             },
@@ -3543,6 +3543,7 @@
                 "[resourceId('Microsoft.Network/networkInterfaces', variables('mgt_nw_interface'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('diagnostic_storagegroup_name'))]"
             ],
+            "tags": "[variables('lustrevm_tags')]",
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "[parameters('lustreVmSize')]"
@@ -3745,7 +3746,6 @@
             "apiVersion": "2019-07-01",
             "name": "[variables('mdt_vm_name')]",
             "location": "[parameters('location')]",
-            "tags": "[variables('lustrevm_tags')]",
             "identity": {
                 "type": "SystemAssigned"
             },
@@ -3753,6 +3753,7 @@
                 "[resourceId('Microsoft.Network/networkInterfaces', variables('mdt_nw_interface'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('diagnostic_storagegroup_name'))]"
             ],
+            "tags": "[variables('lustrevm_tags')]",
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "[parameters('lustreVmSize')]"
@@ -3922,19 +3923,19 @@
             "type": "Microsoft.Compute/virtualMachines",
             "apiVersion": "2019-07-01",
             "name": "[concat(variables('oss_vm_name'), copyIndex(1))]",
+            "location": "[parameters('location')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
             "copy": {
                 "name": "sasnodecopy",
                 "count": "[parameters('numberOfLustreOSSNodes')]"
-            },
-            "location": "[parameters('location')]",
-            "tags": "[variables('lustrevm_tags')]",
-            "identity": {
-                "type": "SystemAssigned"
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces', concat(parameters('SASApplicationName'),'_',variables('oss_vm_name'),copyIndex(1),'_nic'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('diagnostic_storagegroup_name'))]"
             ],
+            "tags": "[variables('lustrevm_tags')]",
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "[parameters('lustreOSSNodeVmSize')]"
@@ -4192,14 +4193,14 @@
             "apiVersion": "2019-07-01",
             "name": "[variables('microservices_vm_name')]",
             "location": "[parameters('location')]",
-            "tags": "[variables('sasviyavm_tags')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces', variables('microservices_nw_interface'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('diagnostic_storagegroup_name'))]"
             ],
-            "identity": {
-                "type": "SystemAssigned"
-            },
+            "tags": "[variables('sasviyavm_tags')]",
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "[parameters('viyaMicroservicesVmSize')]"
@@ -4283,7 +4284,7 @@
                 },
                 "parameters": {
                     "roleAssignmentName": {
-                        "value": "[guid('microservices',resourceGroup().id)]"
+                        "value": "[guid(resourceId('Microsoft.Compute/virtualMachines', variables('microservices_vm_name')), variables('reader_role'), variables('rbacPrincipalID'))]"
                     },
                     "roleDefinitionID": {
                         "value": "[variables('reader_role')]"
@@ -4434,14 +4435,14 @@
             "apiVersion": "2019-07-01",
             "name": "[variables('spre_vm_name')]",
             "location": "[parameters('location')]",
-            "tags": "[variables('sasviyavm_tags')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces', variables('spre_nw_interface'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('diagnostic_storagegroup_name'))]"
             ],
-            "identity": {
-                "type": "SystemAssigned"
-            },
+            "tags": "[variables('sasviyavm_tags')]",
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "[parameters('viyaSPREVmSize')]"
@@ -4526,7 +4527,7 @@
                 },
                 "parameters": {
                     "roleAssignmentName": {
-                        "value": "[guid('spre',resourceGroup().id)]"
+                        "value": "[guid(resourceId('Microsoft.Compute/virtualMachines', variables('spre_vm_name')), variables('reader_role'), variables('rbacPrincipalID'))]"
                     },
                     "roleDefinitionID": {
                         "value": "[variables('reader_role')]"
@@ -4677,14 +4678,14 @@
             "apiVersion": "2019-07-01",
             "name": "[variables('Cascontroller_vm_name')]",
             "location": "[parameters('location')]",
-            "tags": "[variables('sasviyavm_tags')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
             "dependsOn": [
                 "[resourceId('Microsoft.Network/networkInterfaces', variables('cascontroller_nw_interface'))]",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('diagnostic_storagegroup_name'))]"
             ],
-            "identity": {
-                "type": "SystemAssigned"
-            },
+            "tags": "[variables('sasviyavm_tags')]",
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "[parameters('viyaCASControllerVmSize')]"
@@ -4775,7 +4776,7 @@
                 },
                 "parameters": {
                     "roleAssignmentName": {
-                        "value": "[guid('cascontroller',resourceGroup().id)]"
+                        "value": "[guid(resourceId('Microsoft.Compute/virtualMachines', variables('Cascontroller_vm_name')), variables('reader_role'), variables('rbacPrincipalID'))]"
                     },
                     "roleDefinitionID": {
                         "value": "[variables('reader_role')]"
@@ -4931,7 +4932,9 @@
             "apiVersion": "2019-07-01",
             "name": "[concat(variables('casworker_vm_name'), copyIndex())]",
             "location": "[parameters('location')]",
-            "tags": "[variables('sasviyavm_tags')]",
+            "identity": {
+                "type": "SystemAssigned"
+            },
             "copy": {
                 "name": "casworkervmLoop",
                 "count": "[parameters('numberOfViyaCASNodes')]"
@@ -4940,9 +4943,7 @@
                 "casworkernicLoop",
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('diagnostic_storagegroup_name'))]"
             ],
-            "identity": {
-                "type": "SystemAssigned"
-            },
+            "tags": "[variables('sasviyavm_tags')]",
             "properties": {
                 "hardwareProfile": {
                     "vmSize": "[parameters('viyaCASWorkerVmSize')]"
@@ -5025,7 +5026,7 @@
                 },
                 "parameters": {
                     "roleAssignmentName": {
-                        "value": "[guid(concat(variables('casworker_vm_name'), copyIndex()),resourceGroup().id)]"
+                        "value": "[guid(resourceId('Microsoft.Compute/virtualMachines', concat(variables('casworker_vm_name'), copyIndex())), variables('reader_role'), variables('rbacPrincipalID'))]"
                     },
                     "roleDefinitionID": {
                         "value": "[variables('reader_role')]"
