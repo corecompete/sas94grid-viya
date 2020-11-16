@@ -282,10 +282,6 @@
         "diagnostic_storagegroup_name": "[toLower(concat(parameters('SASApplicationName'),'diag', variables('resourceGroupUniqueString')))]",
         "disk_size_10": "[div(parameters('SASLustreDataStorage'), 10)]",
         "domain_name": "internal.cloudapp.net",
-        "enabledForDeployment": true,
-        "enabledForDiskEncryption": false,
-        "enabledForTemplateDeployment": true,
-        "enableSoftDelete": false,
         "grid_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('grid_vm_name'),'_nic')]",
         "grid_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('grid_vm_name'),'_nsg')]",
         "grid_vm_name": "grid",
@@ -612,10 +608,10 @@
             "apiVersion": "2019-09-01",
             "location": "[parameters('location')]",
             "properties": {
-                "enabledForDeployment": "[variables('enabledForDeployment')]",
-                "enabledForDiskEncryption": "[variables('enabledForDiskEncryption')]",
-                "enabledForTemplateDeployment": "[variables('enabledForTemplateDeployment')]",
-                "enableSoftDelete": "[variables('enableSoftDelete')]",
+                "enabledForDeployment": true,
+                "enabledForDiskEncryption": false,
+                "enabledForTemplateDeployment": true,
+                "enableSoftDelete": false,
                 "tenantId": "[variables('tenantId')]",
                 "accessPolicies": [
                     {
