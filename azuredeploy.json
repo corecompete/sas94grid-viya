@@ -355,7 +355,7 @@
         "rdp_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('rdp_vm_name'),'_nsg')]",
         "rdp_os_version": "2019-Datacenter",
         "rdp_vm_name": "rdp",
-        "reader_role": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
+        "reader_role": "[subscriptionResourceId('Microsoft.Authorization/roleDefinitions', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
         "resourceGroupUniqueString": "[uniqueString(resourceGroup().id)]",
         "role_assignment_template": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/role_assignments.json', parameters('_artifactsLocationSasToken')))]",
         "sas_opt_sas_disk_size": 128,
@@ -1890,8 +1890,7 @@
                 "proximityPlacementGroup": {
                     "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups',variables('ppg_name'))]"
                 }
-            },
-            "resources": []
+            }
         },
         {
             "type": "Microsoft.Resources/deployments",
@@ -2242,8 +2241,7 @@
                 "proximityPlacementGroup": {
                     "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups',variables('ppg_name'))]"
                 }
-            },
-            "resources": []
+            }
         },
         {
             "type": "Microsoft.Resources/deployments",
@@ -2383,8 +2381,7 @@
                 "proximityPlacementGroup": {
                     "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups',variables('ppg_name'))]"
                 }
-            },
-            "resources": []
+            }
         },
         {
             "type": "Microsoft.Resources/deployments",
@@ -2657,8 +2654,7 @@
                 "proximityPlacementGroup": {
                     "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups',variables('ppg_name'))]"
                 }
-            },
-            "resources": []
+            }
         },
         {
             "type": "Microsoft.Resources/deployments",
@@ -3033,8 +3029,7 @@
                 "proximityPlacementGroup": {
                     "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups',variables('ppg_name'))]"
                 }
-            },
-            "resources": []
+            }
         },
         {
             "type": "Microsoft.Resources/deployments",
@@ -3316,8 +3311,7 @@
                 "proximityPlacementGroup": {
                     "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups',variables('ppg_name'))]"
                 }
-            },
-            "resources": []
+            }
         },
         {
             "type": "Microsoft.Resources/deployments",
@@ -3610,8 +3604,7 @@
                 "proximityPlacementGroup": {
                     "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups',variables('ppg_name'))]"
                 }
-            },
-            "resources": []
+            }
         },
         {
             "type": "Microsoft.Resources/deployments",
@@ -3821,8 +3814,7 @@
                 "proximityPlacementGroup": {
                     "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups',variables('ppg_name'))]"
                 }
-            },
-            "resources": []
+            }
         },
         {
             "type": "Microsoft.Resources/deployments",
@@ -4085,8 +4077,7 @@
                         "storageUri": "[reference(variables('diagnostic_storagegroup_name')).primaryEndpoints.blob]"
                     }
                 }
-            },
-            "resources": []
+            }
         },
         {
             "type": "Microsoft.Resources/deployments",
@@ -4276,8 +4267,7 @@
                 "proximityPlacementGroup": {
                     "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups',variables('ppg_name'))]"
                 }
-            },
-            "resources": []
+            }
         },
         {
             "type": "Microsoft.Resources/deployments",
@@ -4520,8 +4510,7 @@
                 "proximityPlacementGroup": {
                     "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups',variables('ppg_name'))]"
                 }
-            },
-            "resources": []
+            }
         },
         {
             "type": "Microsoft.Resources/deployments",
@@ -4770,8 +4759,7 @@
                 "proximityPlacementGroup": {
                     "id": "[resourceId('Microsoft.Compute/proximityPlacementGroups',variables('ppg_name'))]"
                 }
-            },
-            "resources": []
+            }
         },
         {
             "type": "Microsoft.Resources/deployments",
