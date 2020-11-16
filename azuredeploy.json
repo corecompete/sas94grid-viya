@@ -38,6 +38,20 @@
                 "description": "Virtual Network Private Subnet CIDR, ex. 10.10.2.0/24 which should allign with VNET CIDR"
             }
         },
+        "ansibleVmSize": {
+            "defaultValue": "Standard_D4s_v3",
+            "type": "String",
+            "metadata": {
+                "description": "This is the SKU for the Ansible VM. The default SKU value represents the minimum recommended size for system stability in most SAS software license sets. The selected SKU must support premium disks. For details: https://azure.microsoft.com/en-in/pricing/details/virtual-machines/red-hat/"
+            }
+        },
+        "windowsRdpVmSize": {
+            "defaultValue": "Standard_D8S_v3",
+            "type": "String",
+            "metadata": {
+                "description": "This is the SKU for the Windows Server VM. The default SKU value represents the minimum recommended size for system stability in most SAS software license sets. The selected SKU must support premium disks"
+            }
+        },
         "SASGridMetaVmSize": {
             "defaultValue": "Standard_D4s_v3",
             "type": "String",
@@ -106,6 +120,13 @@
         },
         "lustreOSSNodeVmSize": {
             "defaultValue": "Standard_E16s_v3",
+            "type": "String",
+            "metadata": {
+                "description": "This is the SKU for the lustre OSS Node VM."
+            }
+        },
+        "lustreVmSize": {
+            "defaultValue": "Standard_F4s_v2",
             "type": "String",
             "metadata": {
                 "description": "This is the SKU for the lustre OSS Node VM."
@@ -272,7 +293,6 @@
         "ansible_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('ansible_vm_name'),'_nsg')]",
         "ansible_pub_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('ansible_vm_name'),'_public_nic')]",
         "ansible_vm_name": "ansible",
-        "ansible_vm_size": "Standard_DS2_v2",
         "cascontroller_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('cascontroller_vm_name'),'_nic')]",
         "cascontroller_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('cascontroller_vm_name'),'_nsg')]",
         "Cascontroller_vm_name": "cascontroller",
@@ -305,7 +325,12 @@
             "import"
         ],
         "linux_extension_template": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/vm_linux_extension.json', parameters('_artifactsLocationSasToken')))]",
-        "LustreVmSize": "Standard_F4s_v2",
+        "lustre_opt_sas_disk_size": 128,
+        "lustre_osdisk_size": 64,
+        "lustrevm_tags": {
+            "Application": "[parameters('SASApplicationName')]",
+            "Component": "Lustre"
+        },
         "mdt_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('mdt_vm_name'),'_nic')]",
         "mdt_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('mdt_vm_name'),'_nsg')]",
         "mdt_vm_name": "mdt",
@@ -323,21 +348,27 @@
         "mid_vm_name": "mid",
         "oss_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('oss_vm_name'),'_nsg')]",
         "oss_vm_name": "oss",
+        "ppg_name": "[concat(parameters('SASApplicationName'),'_ppg')]",
         "pub_sub_nw_sg": "[concat(parameters('SASApplicationName'), '_pub1_subnet_nsg')]",
         "pvt_sub_nw_sg": "[concat(parameters('SASApplicationName'), '_pvt1_subnet_nsg')]",
         "rdp_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('rdp_vm_name'),'_nic')]",
         "rdp_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('rdp_vm_name'),'_nsg')]",
         "rdp_os_version": "2019-Datacenter",
         "rdp_vm_name": "rdp",
-        "rdp_vm_size": "Standard_DS2_v2",
         "reader_role": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
         "resourceGroupUniqueString": "[uniqueString(resourceGroup().id)]",
         "role_assignment_template": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/role_assignments.json', parameters('_artifactsLocationSasToken')))]",
         "sas_opt_sas_disk_size": 128,
         "sas_osdisk_size": 128,
         "sas_viya_backup_size": 100,
-        "lustre_osdisk_size": 64,
-        "lustre_opt_sas_disk_size": 128,
+        "sas94vm_tags": {
+            "Application": "[parameters('SASApplicationName')]",
+            "Component": "SAS94NonGrid"
+        },
+        "sasviyavm_tags": {
+            "Application": "[parameters('SASApplicationName')]",
+            "Component": "SASViya"
+        },
         "secretsPermissions": [
             "get",
             "list",
@@ -353,20 +384,7 @@
         "vnet_pub_subnt": "[concat(parameters('SASApplicationName'),'_vnet_pub1_subnet')]",
         "vnet_pvt_subnt": "[concat(parameters('SASApplicationName'), '_vnet_pvt1_subnet')]",
         "vnet_viya_pvt_subnt": "[concat(parameters('SASApplicationName'), '_vnet_pvt3_subnet')]",
-        "windows_extension_template": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/vm_windows_extension.json', parameters('_artifactsLocationSasToken')))]",
-        "ppg_name": "[concat(parameters('SASApplicationName'),'_ppg')]",
-        "sas94vm_tags": {
-            "Application": "[parameters('SASApplicationName')]",
-            "Component": "SAS94NonGrid"
-        },
-        "sasviyavm_tags": {
-            "Application": "[parameters('SASApplicationName')]",
-            "Component": "SASViya"
-        },
-        "lustrevm_tags": {
-            "Application": "[parameters('SASApplicationName')]",
-            "Component": "Lustre"
-        }
+        "windows_extension_template": "[uri(parameters('_artifactsLocation'), concat('nestedtemplates/vm_windows_extension.json', parameters('_artifactsLocationSasToken')))]"
     },
     "resources": [
         {
@@ -1813,7 +1831,7 @@
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[variables('ansible_vm_size')]"
+                    "vmSize": "[parameters('ansibleVmSize')]"
                 },
                 "storageProfile": {
                     "imageReference": {
@@ -2190,7 +2208,7 @@
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[variables('rdp_vm_size')]"
+                    "vmSize": "[parameters('windowsRdpVmSize')]"
                 },
                 "storageProfile": {
                     "imageReference": {
@@ -3533,7 +3551,7 @@
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[variables('LustreVmSize')]"
+                    "vmSize": "[parameters('lustreVmSize')]"
                 },
                 "storageProfile": {
                     "imageReference": {
@@ -3744,7 +3762,7 @@
             ],
             "properties": {
                 "hardwareProfile": {
-                    "vmSize": "[variables('LustreVmSize')]"
+                    "vmSize": "[parameters('lustreVmSize')]"
                 },
                 "storageProfile": {
                     "imageReference": {
