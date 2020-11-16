@@ -5,6 +5,9 @@
 		"adminIngressLocation": {
 			"value": "183.83.137.123"
 		},
+		"primaryUserName": {
+			"value": "GEN-UNIQUE"
+		},
 		"SASExternalPassword": {
 			"value": "GEN-PASSWORD"
 		},

@@ -75,6 +75,12 @@
                 "description": "The number of SAS Grid Node to create."
             }
         },
+        "primaryUserName": {
+            "type": "string",
+            "metadata": {
+                "description": "Username for the Virtual Machine."
+            }
+        },
         "SASExternalPassword": {
             "minLength": 12,
             "maxLength": 14,
@@ -317,12 +323,11 @@
         "mid_vm_name": "mid",
         "oss_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('oss_vm_name'),'_nsg')]",
         "oss_vm_name": "oss",
-        "PrimaryUserName": "vmuser",
         "pub_sub_nw_sg": "[concat(parameters('SASApplicationName'), '_pub1_subnet_nsg')]",
         "pvt_sub_nw_sg": "[concat(parameters('SASApplicationName'), '_pvt1_subnet_nsg')]",
         "rdp_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('rdp_vm_name'),'_nic')]",
         "rdp_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('rdp_vm_name'),'_nsg')]",
-        "rdp_os_version": "2012-R2-Datacenter",
+        "rdp_os_version": "2019-Datacenter",
         "rdp_vm_name": "rdp",
         "rdp_vm_size": "Standard_DS2_v2",
         "reader_role": "[concat('/subscriptions/', subscription().subscriptionId, '/providers/Microsoft.Authorization/roleDefinitions/', 'acdd72a7-3385-48ef-bd42-f606fba81ae7')]",
@@ -1838,13 +1843,13 @@
                 },
                 "osProfile": {
                     "computerName": "[variables('ansible_vm_name')]",
-                    "adminUsername": "[variables('PrimaryUserName')]",
+                    "adminUsername": "[parameters('primaryUserName')]",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": true,
                         "ssh": {
                             "publicKeys": [
                                 {
-                                    "path": "[concat('/home/', variables('PrimaryUserName'), '/.ssh/authorized_keys')]",
+                                    "path": "[concat('/home/', parameters('primaryUserName'), '/.ssh/authorized_keys')]",
                                     "keyData": "[parameters('SSHPublicKey')]"
                                 }
                             ]
@@ -2200,7 +2205,7 @@
                 },
                 "osProfile": {
                     "computerName": "[variables('rdp_vm_name')]",
-                    "adminUsername": "[variables('PrimaryUserName')]",
+                    "adminUsername": "[parameters('primaryUserName')]",
                     "adminPassword": "[parameters('SASExternalPassword')]"
                 },
                 "networkProfile": {
@@ -2331,13 +2336,13 @@
                 },
                 "osProfile": {
                     "computerName": "[variables('meta_vm_name')]",
-                    "adminUsername": "[variables('PrimaryUserName')]",
+                    "adminUsername": "[parameters('primaryUserName')]",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": true,
                         "ssh": {
                             "publicKeys": [
                                 {
-                                    "path": "[concat('/home/', variables('PrimaryUserName'), '/.ssh/authorized_keys')]",
+                                    "path": "[concat('/home/', parameters('primaryUserName'), '/.ssh/authorized_keys')]",
                                     "keyData": "[parameters('SSHPublicKey')]"
                                 }
                             ]
@@ -2604,14 +2609,14 @@
                 },
                 "osProfile": {
                     "computerName": "[variables('grid_vm_name')]",
-                    "adminUsername": "[variables('PrimaryUserName')]",
+                    "adminUsername": "[parameters('primaryUserName')]",
                     "customData": "[base64(variables('custom_data_sas'))]",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": true,
                         "ssh": {
                             "publicKeys": [
                                 {
-                                    "path": "[concat('/home/', variables('PrimaryUserName'), '/.ssh/authorized_keys')]",
+                                    "path": "[concat('/home/', parameters('primaryUserName'), '/.ssh/authorized_keys')]",
                                     "keyData": "[parameters('SSHPublicKey')]"
                                 }
                             ]
@@ -2981,13 +2986,13 @@
                 },
                 "osProfile": {
                     "computerName": "[variables('mid_vm_name')]",
-                    "adminUsername": "[variables('PrimaryUserName')]",
+                    "adminUsername": "[parameters('primaryUserName')]",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": true,
                         "ssh": {
                             "publicKeys": [
                                 {
-                                    "path": "[concat('/home/', variables('PrimaryUserName'), '/.ssh/authorized_keys')]",
+                                    "path": "[concat('/home/', parameters('primaryUserName'), '/.ssh/authorized_keys')]",
                                     "keyData": "[parameters('SSHPublicKey')]"
                                 }
                             ]
@@ -3263,14 +3268,14 @@
                 },
                 "osProfile": {
                     "computerName": "[concat(variables('gridnode_vm_name'), copyIndex(1))]",
-                    "adminUsername": "[variables('PrimaryUserName')]",
+                    "adminUsername": "[parameters('primaryUserName')]",
                     "customData": "[base64(variables('custom_data_sas'))]",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": true,
                         "ssh": {
                             "publicKeys": [
                                 {
-                                    "path": "[concat('/home/', variables('PrimaryUserName'), '/.ssh/authorized_keys')]",
+                                    "path": "[concat('/home/', parameters('primaryUserName'), '/.ssh/authorized_keys')]",
                                     "keyData": "[parameters('SSHPublicKey')]"
                                 }
                             ]
@@ -3558,13 +3563,13 @@
                 },
                 "osProfile": {
                     "computerName": "[variables('mgt_vm_name')]",
-                    "adminUsername": "[variables('PrimaryUserName')]",
+                    "adminUsername": "[parameters('primaryUserName')]",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": true,
                         "ssh": {
                             "publicKeys": [
                                 {
-                                    "path": "[concat('/home/', variables('PrimaryUserName'), '/.ssh/authorized_keys')]",
+                                    "path": "[concat('/home/', parameters('primaryUserName'), '/.ssh/authorized_keys')]",
                                     "keyData": "[parameters('SSHPublicKey')]"
                                 }
                             ]
@@ -3769,13 +3774,13 @@
                 },
                 "osProfile": {
                     "computerName": "[variables('mdt_vm_name')]",
-                    "adminUsername": "[variables('PrimaryUserName')]",
+                    "adminUsername": "[parameters('primaryUserName')]",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": true,
                         "ssh": {
                             "publicKeys": [
                                 {
-                                    "path": "[concat('/home/', variables('PrimaryUserName'), '/.ssh/authorized_keys')]",
+                                    "path": "[concat('/home/', parameters('primaryUserName'), '/.ssh/authorized_keys')]",
                                     "keyData": "[parameters('SSHPublicKey')]"
                                 }
                             ]
@@ -4036,13 +4041,13 @@
                 },
                 "osProfile": {
                     "computerName": "[concat(variables('oss_vm_name'), copyIndex(1))]",
-                    "adminUsername": "[variables('PrimaryUserName')]",
+                    "adminUsername": "[parameters('primaryUserName')]",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": true,
                         "ssh": {
                             "publicKeys": [
                                 {
-                                    "path": "[concat('/home/', variables('PrimaryUserName'), '/.ssh/authorized_keys')]",
+                                    "path": "[concat('/home/', parameters('primaryUserName'), '/.ssh/authorized_keys')]",
                                     "keyData": "[parameters('SSHPublicKey')]"
                                 }
                             ]
@@ -4224,13 +4229,13 @@
                 },
                 "osProfile": {
                     "computerName": "[variables('microservices_vm_name')]",
-                    "adminUsername": "[variables('PrimaryUserName')]",
+                    "adminUsername": "[parameters('primaryUserName')]",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": true,
                         "ssh": {
                             "publicKeys": [
                                 {
-                                    "path": "[concat('/home/', variables('PrimaryUserName'), '/.ssh/authorized_keys')]",
+                                    "path": "[concat('/home/', parameters('primaryUserName'), '/.ssh/authorized_keys')]",
                                     "keyData": "[parameters('SSHPublicKey')]"
                                 }
                             ]
@@ -4467,14 +4472,14 @@
                 },
                 "osProfile": {
                     "computerName": "[variables('spre_vm_name')]",
-                    "adminUsername": "[variables('PrimaryUserName')]",
+                    "adminUsername": "[parameters('primaryUserName')]",
                     "customData": "[base64(variables('custom_data_sas'))]",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": true,
                         "ssh": {
                             "publicKeys": [
                                 {
-                                    "path": "[concat('/home/', variables('PrimaryUserName'), '/.ssh/authorized_keys')]",
+                                    "path": "[concat('/home/', parameters('primaryUserName'), '/.ssh/authorized_keys')]",
                                     "keyData": "[parameters('SSHPublicKey')]"
                                 }
                             ]
@@ -4717,14 +4722,14 @@
                 },
                 "osProfile": {
                     "computerName": "[variables('Cascontroller_vm_name')]",
-                    "adminUsername": "[variables('PrimaryUserName')]",
+                    "adminUsername": "[parameters('primaryUserName')]",
                     "customData": "[base64(variables('custom_data_cas'))]",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": true,
                         "ssh": {
                             "publicKeys": [
                                 {
-                                    "path": "[concat('/home/', variables('PrimaryUserName'), '/.ssh/authorized_keys')]",
+                                    "path": "[concat('/home/', parameters('primaryUserName'), '/.ssh/authorized_keys')]",
                                     "keyData": "[parameters('SSHPublicKey')]"
                                 }
                             ]
@@ -4970,14 +4975,14 @@
                 },
                 "osProfile": {
                     "computerName": "[concat(variables('casworker_vm_name'), copyIndex())]",
-                    "adminUsername": "[variables('PrimaryUserName')]",
+                    "adminUsername": "[parameters('primaryUserName')]",
                     "customData": "[base64(variables('custom_data_cas'))]",
                     "linuxConfiguration": {
                         "disablePasswordAuthentication": true,
                         "ssh": {
                             "publicKeys": [
                                 {
-                                    "path": "[concat('/home/', variables('PrimaryUserName'), '/.ssh/authorized_keys')]",
+                                    "path": "[concat('/home/', parameters('primaryUserName'), '/.ssh/authorized_keys')]",
                                     "keyData": "[parameters('SSHPublicKey')]"
                                 }
                             ]
