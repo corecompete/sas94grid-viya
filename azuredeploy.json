@@ -2477,9 +2477,7 @@
             "apiVersion": "2019-10-01",
             "name": "Phase1-MetaHostSetup",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', variables('meta_vm_name'))]",
-                "[concat('Microsoft.Compute/virtualMachines/extensions/', variables('meta_vm_name'), '/ContentFileDownload')]"
-                
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('meta_vm_name'))]"                
             ],
             "properties": {
                 "mode": "Incremental",
@@ -2772,8 +2770,7 @@
             "apiVersion": "2019-10-01",
             "name": "Phase1-GridHostSetup",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines',variables('grid_vm_name'))]",
-                "[concat('Microsoft.Compute/virtualMachines/extensions/', variables('grid_vm_name'), '/ContentFileDownload')]"
+                "[resourceId('Microsoft.Compute/virtualMachines',variables('grid_vm_name'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -3168,8 +3165,7 @@
             "apiVersion": "2019-10-01",
             "name": "Phase1-MidHostsetup",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines',variables('mid_vm_name'))]",
-                "[concat('Microsoft.Compute/virtualMachines/extensions/', variables('mid_vm_name'), '/ContentFileDownload')]"
+                "[resourceId('Microsoft.Compute/virtualMachines',variables('mid_vm_name'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -3731,7 +3727,7 @@
             "apiVersion": "2019-10-01",
             "name": "Phase1-MgtHostSetup",
             "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/extensions/', variables('mgt_vm_name'), '/ContentFileDownload')]"
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('mgt_vm_name'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -3962,7 +3958,7 @@
             "apiVersion": "2019-10-01",
             "name": "Phase1-MdtHostSetup",
             "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/extensions/', variables('mdt_vm_name'), '/ContentFileDownload')]"
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('mdt_vm_name'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -4256,7 +4252,7 @@
                 "count": "[parameters('numberOfLustreOSSNodes')]"
             },
             "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/extensions/', variables('oss_vm_name'), copyIndex(1), '/ContentFileDownload')]"
+                "[resourceId('Microsoft.Compute/virtualMachines', concat(variables('oss_vm_name'), copyIndex(1)))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -4524,8 +4520,7 @@
             "apiVersion": "2019-10-01",
             "name": "Phase1-MicroServicesHostSetup",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', variables('microservices_vm_name'))]",
-                "[concat('Microsoft.Compute/virtualMachines/extensions/', variables('microservices_vm_name'),'/ContentFileDownload')]"
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('microservices_vm_name'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -4788,8 +4783,7 @@
             "apiVersion": "2019-10-01",
             "name": "Phase1-SpreHostSetup",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines',  variables('spre_vm_name'))]",
-                "[concat('Microsoft.Compute/virtualMachines/extensions/', variables('spre_vm_name'),'/ContentFileDownload')]"
+                "[resourceId('Microsoft.Compute/virtualMachines',  variables('spre_vm_name'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -5059,8 +5053,7 @@
             "apiVersion": "2019-10-01",
             "name": "Phase1-CASControllerHostSetup",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines',  variables('Cascontroller_vm_name'))]",
-                "[concat('Microsoft.Compute/virtualMachines/extensions/', variables('Cascontroller_vm_name'),'/ContentFileDownload')]"
+                "[resourceId('Microsoft.Compute/virtualMachines',  variables('Cascontroller_vm_name'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -5345,8 +5338,7 @@
                 "count": "[parameters('numberOfViyaCASNodes')]"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', concat(variables('casworker_vm_name'), copyIndex()))]",
-                "[concat('Microsoft.Compute/virtualMachines/extensions/', variables('casworker_vm_name'), copyIndex(), '/ContentFileDownload')]"
+                "[resourceId('Microsoft.Compute/virtualMachines', concat(variables('casworker_vm_name'), copyIndex()))]"
             ],
             "properties": {
                 "mode": "Incremental",
