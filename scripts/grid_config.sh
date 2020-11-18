@@ -16,26 +16,29 @@ app_name=`facter application_name`
 sas_role=`facter sas_role`   
 domain_name=`facter domain_name`
 res_dir="/opt/sas/resources/responsefiles"
+resource_dir="/opt/sas/resources"
 artifact_loc=`facter artifact_loc`
-ssl_prop_url=${artifact_loc}properties/ssl_cert.properties
-plan_file_url=${artifact_loc}properties/plan.xml
-gridinstall_url=${artifact_loc}properties/grid_install.properties
-gridconfig_url=${artifact_loc}properties/grid_config.properties
-inst_prop=$res_dir/grid_install.properties
-conf_prop=$res_dir/grid_config.properties
-cert_prop=${res_dir}/ssl_cert.properties
+#ssl_prop_url=${artifact_loc}properties/ssl_cert.properties
+#plan_file_url=${artifact_loc}properties/plan.xml
+#gridinstall_url=${artifact_loc}properties/grid_install.properties
+#gridconfig_url=${artifact_loc}properties/grid_config.properties
+inst_prop=$/grid_install.properties
+conf_prop=$resource_dir/grid_config.properties
+cert_prop=${resource_dir}/ssl_cert.properties
 
 #Downloading SAS SSL properties file
-wget -P $res_dir $ssl_prop_url
+cp -p ${res_dir}/ssl_cert.properties ${resource_dir}
+chown -R sasinst:sas ${resource_dir}
+
 ##Altering the certificate in property file
-sed -i "s|certname|${app_name}|g" ${res_dir}/ssl_cert.properties
+sed -i "s|certname|${app_name}|g" ${resource_dir}/ssl_cert.properties
 
 ## Password Update
 encsasextpw=$(</root/encext.txt)
-sed -i "s/changeextpass/${encsasextpw}/g" $res_dir/*.properties
+sed -i "s/changeextpass/${encsasextpw}/g" $resource_dir/*.properties
 echo "Encrypted password has been updated successfully."
 encsasintpw=$(</root/encint.txt)
-sed -i "s/changeintpass/${encsasintpw}/g" $res_dir/*.properties
+sed -i "s/changeintpass/${encsasintpw}/g" $resource_dir/*.properties
 echo "Encrypted password has been updated succesfully."
 rm -f /root/enc*.txt
 

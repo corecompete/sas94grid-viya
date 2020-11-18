@@ -44,6 +44,7 @@ stgacc_secr_name=${18}
 sas_role=${19}
 artifact_loc=${20}
 grid_nodes=${21}
+cifs_server_fqdn=${22}
 mid_hostname=${1}${12}
 meta_hostname=${1}${13}
 grid_hostname=${1}${14}
@@ -81,6 +82,7 @@ key_vault_name=`facter key_vault_name`
 app_name=`facter application_name`
 sasint_secret_name=`facter sasint_secret_name`
 sasext_secret_name=`facter sasext_secret_name`
+cifs_server_fqdn=`facter cifs_server_fqdn`
 sas_lustre_dir="/opt/sas"  
 sas_local_dir="/usr/local"
 sas_resource_dir="/opt/sas/resources"
@@ -253,8 +255,7 @@ else
       echo "password=${store_key}" >> /etc/smbcredentials/store.cred
    fi
    sudo chmod 600 /etc/smbcredentials/store.cred
-   #echo "//${store_name}.file.core.windows.net/${store_loc} /sasdepot cifs nofail,vers=3.0,credentials=/etc/smbcredentials/store.cred,dir_mode=0777,file_mode=0777,serverino" >> /etc/fstab
-   sudo mount -t cifs //${store_name}.file.core.windows.net/${store_loc} /sasdepot -o vers=3.0,credentials=/etc/smbcredentials/store.cred,dir_mode=0777,file_mode=0777,serverino
+   sudo mount -t cifs //${cifs_server_fqdn}/${store_loc} /sasdepot -o vers=3.0,credentials=/etc/smbcredentials/store.cred,dir_mode=0777,file_mode=0777,serverino
    fail_if_error $? "ERROR: Failed to mount Azure file share"
 fi
 

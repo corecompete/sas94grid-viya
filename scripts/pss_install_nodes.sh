@@ -60,7 +60,7 @@ fail_if_error $? "ERROR: kernel package installation failed."
 echo "Downloading and installing lustre packages "
 mkdir -p /tmp/lustre_package
 cd /tmp/lustre_package
-wget ${artifact_loc}lustre_rpm_packages/lustre_packages.zip
+cp -p /tmp/lustre_packages.zip /tmp/lustre_package/
 unzip lustre_packages.zip
 yum localinstall lustre-client-2.12.4-1.el7.x86_64.rpm kmod-lustre-client-2.12.4-1.el7.x86_64.rpm -y
 fail_if_error $? "ERROR: Client installation failed."

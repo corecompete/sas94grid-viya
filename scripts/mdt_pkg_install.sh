@@ -19,7 +19,7 @@ fail_if_error $? "ERROR: Dependency packages installation failed."
 
 ##Downloading RPM's packages and installing
 cd /opt/lustre-temp/
-wget ${artifact_loc}lustre_rpm_packages/lustre_server_pkg.zip
+cp -p /tmp/lustre_server_pkg.zip /opt/lustre-temp/
 unzip lustre_server_pkg.zip
 cd package
 yum localinstall e2fsprogs-1.45.6.wc1-0.el7.x86_64.rpm e2fsprogs-debuginfo-1.45.6.wc1-0.el7.x86_64.rpm e2fsprogs-devel-1.45.6.wc1-0.el7.x86_64.rpm e2fsprogs-libs-1.45.6.wc1-0.el7.x86_64.rpm e2fsprogs-static-1.45.6.wc1-0.el7.x86_64.rpm libcom_err-1.45.6.wc1-0.el7.x86_64.rpm libcom_err-devel-1.45.6.wc1-0.el7.x86_64.rpm libss-1.45.6.wc1-0.el7.x86_64.rpm libss-devel-1.45.6.wc1-0.el7.x86_64.rpm -y

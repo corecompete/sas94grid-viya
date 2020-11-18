@@ -3,6 +3,7 @@ set -x
 
 echo "*** Phase 2 - Viya-ARK Script Started at `date +'%Y-%m-%d_%H-%M-%S'` ***"
 
+
 ## Functions
 fail_if_error() {
   [ $1 != 0 ] && {
@@ -19,7 +20,6 @@ sasint_secret_name=`facter sasintpwd`
 sasext_secret_name=`facter casintpwd`
 CODE_DIRECTORY="/opt/viya-ark"
 playbook_directory="$CODE_DIRECTORY/pre-install-playbook"
-viya_ark_uri=${artifact_loc}viya-ark.tar.gz
 
 # Setting up the public key under root user for passwordless SSH
 az login --identity
@@ -28,13 +28,13 @@ saspwd=`az keyvault secret show -n $sasint_secret_name --vault-name $key_vault_n
 caspwd=`az keyvault secret show -n $sasext_secret_name --vault-name $key_vault_name | grep value | cut -d '"' -f4`
 echo `az keyvault secret show -n ${pub_keyname}  --vault-name ${key_vault_name} | grep value | cut -d '"' -f4` >> ~/.ssh/authorized_keys
 
-###Downloading viya-ark from git
-wget $viya_ark_uri
+
 ##untar viya-ark
 if [ ! -d ${CODE_DIRECTORY} ]; then
     mkdir -p ${CODE_DIRECTORY}
 fi
-  tar -xzvf viya-ark.tar.gz -C ${CODE_DIRECTORY}
+  tar -xzvf /tmp/viya-ark.tar.gz -C ${CODE_DIRECTORY}
+  fail_if_error $? "viya-ark file not found"
 #
 ## Running the Ansible Playbook on the Viya Servers
 #

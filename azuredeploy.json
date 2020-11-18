@@ -303,6 +303,12 @@
             "get",
             "list"
         ],
+        "contentfileuris": [
+            "[uri(parameters('_artifactsLocation'), concat('properties/response-properties.tar.gz', parameters('_artifactsLocationSasToken')))]",
+            "[uri(parameters('_artifactsLocation'), concat('properties/viya-ark.tar.gz', parameters('_artifactsLocationSasToken')))]",
+            "[uri(parameters('_artifactsLocation'), concat('lustrepackages/lustre_packages.zip', parameters('_artifactsLocationSasToken')))]",
+            "[uri(parameters('_artifactsLocation'), concat('lustrepackages/lustre_server_pkg.zip', parameters('_artifactsLocationSasToken')))]"
+        ],
         "custom_data_cas": "#cloud-config\n mounts:\n   - [ ephemeral0, /cascache]",
         "custom_data_sas": "#cloud-config\n mounts:\n   - [ ephemeral0, /saswork]",
         "diagnostic_storagegroup_name": "[toLower(concat(parameters('SASApplicationName'),'diag', variables('resourceGroupUniqueString')))]",
@@ -379,6 +385,7 @@
         "spre_nw_interface": "[concat(parameters('SASApplicationName'),'_',variables('spre_vm_name'),'_nic')]",
         "spre_nw_sg": "[concat(parameters('SASApplicationName'),'_',variables('spre_vm_name'),'_nsg')]",
         "spre_vm_name": "spre",
+        "storage_account_uri": "[concat(parameters('storageAccountName'),'.file.',environment().suffixes.storage)]",
         "tenantId": "[subscription().tenantId]",
         "vnet_lustre_pvt_subnt": "[concat(parameters('SASApplicationName'), '_vnet_pvt2_subnet')]",
         "vnet_name": "[concat(parameters('SASApplicationName'),'_vnet')]",
@@ -1974,7 +1981,7 @@
                         "value": "[variables('ansible_vm_name')]"
                     },
                     "commandToExecute": {
-                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./ansible_setup.sh',' ',parameters('storageAccountName'),' ',variables('key_vault_secretname_stgacc'),' ',parameters('fileShareName'),' ',parameters('viyaRepoFolder'),' ',parameters('SASApplicationName'),' ',variables('domain_name'),' ',variables('ansible_vm_name'),' ',variables('microservices_vm_name'),' ',variables('cascontroller_vm_name'),' ',variables('spre_vm_name'),' ',variables('casworker_vm_name'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',parameters('numberOfViyaCASNodes'),' ',variables('mid_vm_name'),' ',parameters('_artifactsLocation'),' ',variables('grid_vm_name'),' ',variables('meta_vm_name'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
+                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./ansible_setup.sh',' ',parameters('storageAccountName'),' ',variables('key_vault_secretname_stgacc'),' ',parameters('fileShareName'),' ',parameters('viyaRepoFolder'),' ',parameters('SASApplicationName'),' ',variables('domain_name'),' ',variables('ansible_vm_name'),' ',variables('microservices_vm_name'),' ',variables('cascontroller_vm_name'),' ',variables('spre_vm_name'),' ',variables('casworker_vm_name'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',parameters('numberOfViyaCASNodes'),' ',variables('mid_vm_name'),' ',parameters('_artifactsLocation'),' ',variables('grid_vm_name'),' ',variables('meta_vm_name'),' ',variables('storage_account_uri'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
                     },
                     "filepath": {
                         "value": "scripts/ansible_setup.sh"
@@ -2265,7 +2272,7 @@
                         "value": "[variables('rdp_vm_name')]"
                     },
                     "commandToExecute": {
-                        "value": "[concat('powershell -ExecutionPolicy Unrestricted -File sas_clients_install.ps1 ','-stg_acc_name ',parameters('storageAccountName'),' -stg_key ',parameters('storageAccountKey'),' -file_share_name ',parameters('fileShareName'),' -depot_folder_name ',parameters('SASDepotFolder'),' -clients_sid ',parameters('SASServerLicenseFile'),' -app_name ',parameters('SASApplicationName'),' -mid_name ',variables('mid_vm_name'),' -domain_name ',variables('domain_name'),' -artifact_loc ',parameters('_artifactsLocation'))]"
+                        "value": "[concat('powershell -ExecutionPolicy Unrestricted -File sas_clients_install.ps1 ','-stg_acc_name ',parameters('storageAccountName'),' -stg_key ',parameters('storageAccountKey'),' -file_share_name ',parameters('fileShareName'),' -depot_folder_name ',parameters('SASDepotFolder'),' -clients_sid ',parameters('SASServerLicenseFile'),' -app_name ',parameters('SASApplicationName'),' -mid_name ',variables('mid_vm_name'),' -domain_name ',variables('domain_name'),' -artifact_loc ',parameters('_artifactsLocation'),' -storageuri ',variables('storage_account_uri'))]"
                     },
                     "filepath": {
                         "value": "sas_clients_install.ps1"
@@ -2445,12 +2452,33 @@
             }
         },
         {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2015-06-15",
+            "name": "[concat(variables('meta_vm_name'),'/ContentFileDownload')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'MetaAccessPolicy')]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": "[variables('contentfileuris')]"
+                },
+                "protectedSettings": {
+                    "commandToExecute": "cp lustre* response* /tmp/"
+                }
+            }
+        },
+        {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
             "name": "Phase1-MetaHostSetup",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines',variables('meta_vm_name'))]",
-                "[resourceId('Microsoft.Resources/deployments', 'MetaAccessPolicy')]"
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('meta_vm_name'))]",
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions', concat(variables('meta_vm_name'),'/ContentFileDownload'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -2465,7 +2493,7 @@
                         "value": "[variables('meta_vm_name')]"
                     },
                     "commandToExecute": {
-                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./sasappgrid_prereq.sh',' ',parameters('SASApplicationName'),' ',parameters('SASDepotFolder'),' ',parameters('fileShareName'),' ',parameters('storageAccountName'),' ',variables('domain_name'),' ',parameters('location'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',variables('mid_vm_name'),' ',variables('meta_vm_name'),' ',variables('grid_vm_name'),' ',parameters('SASServerLicenseFile'),' ',parameters('SASGridLicenseFile'),' ',parameters('SASLsfLicenseFile'),' ',variables('key_vault_secretname_stgacc'),' ','meta',' ',parameters('_artifactsLocation'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
+                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./sasappgrid_prereq.sh',' ',parameters('SASApplicationName'),' ',parameters('SASDepotFolder'),' ',parameters('fileShareName'),' ',parameters('storageAccountName'),' ',variables('domain_name'),' ',parameters('location'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',variables('mid_vm_name'),' ',variables('meta_vm_name'),' ',variables('grid_vm_name'),' ',parameters('SASServerLicenseFile'),' ',parameters('SASGridLicenseFile'),' ',parameters('SASLsfLicenseFile'),' ',variables('key_vault_secretname_stgacc'),' ','meta',' ',parameters('_artifactsLocation'),' ',variables('storage_account_uri'),' ',variables('storage_account_uri'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
                     },
                     "filepath": {
                         "value": "scripts/sasappgrid_prereq.sh"
@@ -2718,12 +2746,33 @@
             }
         },
         {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2015-06-15",
+            "name": "[concat(variables('grid_vm_name'),'/ContentFileDownload')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'GridAccessPolicy')]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": "[variables('contentfileuris')]"
+                },
+                "protectedSettings": {
+                    "commandToExecute": "cp lustre* response* /tmp/"
+                }
+            }
+        },
+        {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
             "name": "Phase1-GridHostSetup",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines',variables('grid_vm_name'))]",
-                "[resourceId('Microsoft.Resources/deployments', 'GridAccessPolicy')]"
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions', concat(variables('grid_vm_name'),'/ContentFileDownload'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -2738,7 +2787,7 @@
                         "value": "[variables('grid_vm_name')]"
                     },
                     "commandToExecute": {
-                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./sasappgrid_prereq.sh',' ',parameters('SASApplicationName'),' ',parameters('SASDepotFolder'),' ',parameters('fileShareName'),' ',parameters('storageAccountName'),' ',variables('domain_name'),' ',parameters('location'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',variables('mid_vm_name'),' ',variables('meta_vm_name'),' ',variables('grid_vm_name'),' ',parameters('SASServerLicenseFile'),' ',parameters('SASGridLicenseFile'),' ',parameters('SASLsfLicenseFile'),' ',variables('key_vault_secretname_stgacc'),' ','grid',' ',parameters('_artifactsLocation'),' ',parameters('numberOfSASGridNodes'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
+                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./sasappgrid_prereq.sh',' ',parameters('SASApplicationName'),' ',parameters('SASDepotFolder'),' ',parameters('fileShareName'),' ',parameters('storageAccountName'),' ',variables('domain_name'),' ',parameters('location'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',variables('mid_vm_name'),' ',variables('meta_vm_name'),' ',variables('grid_vm_name'),' ',parameters('SASServerLicenseFile'),' ',parameters('SASGridLicenseFile'),' ',parameters('SASLsfLicenseFile'),' ',variables('key_vault_secretname_stgacc'),' ','grid',' ',parameters('_artifactsLocation'),' ',parameters('numberOfSASGridNodes'),' ',variables('storage_account_uri'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
                     },
                     "filepath": {
                         "value": "scripts/sasappgrid_prereq.sh"
@@ -3093,12 +3142,33 @@
             }
         },
         {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2015-06-15",
+            "name": "[concat(variables('mid_vm_name'),'/ContentFileDownload')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'MidAccessPolicy')]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": "[variables('contentfileuris')]"
+                },
+                "protectedSettings": {
+                    "commandToExecute": "cp lustre* response* /tmp/"
+                }
+            }
+        },
+        {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
             "name": "Phase1-MidHostsetup",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines',variables('mid_vm_name'))]",
-                "[resourceId('Microsoft.Resources/deployments', 'MidAccessPolicy')]"
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions', concat(variables('mid_vm_name'),'/ContentFileDownload'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -3113,7 +3183,7 @@
                         "value": "[variables('mid_vm_name')]"
                     },
                     "commandToExecute": {
-                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./sasappgrid_prereq.sh',' ',parameters('SASApplicationName'),' ',parameters('SASDepotFolder'),' ',parameters('fileShareName'),' ',parameters('storageAccountName'),' ',variables('domain_name'),' ',parameters('location'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',variables('mid_vm_name'),' ',variables('meta_vm_name'),' ',variables('grid_vm_name'),' ',parameters('SASServerLicenseFile'),' ',parameters('SASGridLicenseFile'),' ',parameters('SASLsfLicenseFile'),' ',variables('key_vault_secretname_stgacc'),' ','mid',' ',parameters('_artifactsLocation'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
+                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./sasappgrid_prereq.sh',' ',parameters('SASApplicationName'),' ',parameters('SASDepotFolder'),' ',parameters('fileShareName'),' ',parameters('storageAccountName'),' ',variables('domain_name'),' ',parameters('location'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',variables('mid_vm_name'),' ',variables('meta_vm_name'),' ',variables('grid_vm_name'),' ',parameters('SASServerLicenseFile'),' ',parameters('SASGridLicenseFile'),' ',parameters('SASLsfLicenseFile'),' ',variables('key_vault_secretname_stgacc'),' ','mid',' ',parameters('_artifactsLocation'),' ',variables('storage_account_uri'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
                     },
                     "filepath": {
                         "value": "scripts/sasappgrid_prereq.sh"
@@ -3348,10 +3418,10 @@
             "apiVersion": "2019-10-01",
             "name": "[concat('GridNode-AccessPolicy', copyIndex(1))]",
             "copy": {
-                "mode": "serial",
-                "batchSize": 1,
                 "name": "sasgridnodecopy",
-                "count": "[parameters('numberOfSASGridNodes')]"
+                "count": "[parameters('numberOfSASGridNodes')]",
+                "mode": "serial",
+                "batchSize": 1
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', concat(variables('gridnode_vm_name'), copyIndex(1)))]",
@@ -3385,6 +3455,33 @@
             }
         },
         {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2015-06-15",
+            "name": "[concat(variables('gridnode_vm_name'), copyIndex(1), '/ContentFileDownload')]",
+            "location": "[resourceGroup().location]",
+			"copy": {
+                "name": "contentdownloadcopy",
+                "count": "[parameters('numberOfSASGridNodes')]",
+				"mode": "serial",
+                "batchSize": 1
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', concat('GridNode-AccessPolicy', copyIndex(1)))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": "[variables('contentfileuris')]"
+                },
+                "protectedSettings": {
+                    "commandToExecute": "cp lustre* response* /tmp/"
+                }
+            }
+        },
+        {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
             "name": "[concat('Phase1-GridNodeHostSetup', copyIndex(1))]",
@@ -3394,7 +3491,7 @@
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines',concat(variables('gridnode_vm_name'), copyIndex(1)))]",
-                "[resourceId('Microsoft.Resources/deployments', concat('GridNode-AccessPolicy', copyIndex(1)))]"
+                "contentdownloadcopy"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -3409,7 +3506,7 @@
                         "value": "[concat(variables('gridnode_vm_name'), copyIndex(1))]"
                     },
                     "commandToExecute": {
-                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./sasappgrid_prereq.sh',' ',parameters('SASApplicationName'),' ',parameters('SASDepotFolder'),' ',parameters('fileShareName'),' ',parameters('storageAccountName'),' ',variables('domain_name'),' ',parameters('location'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',variables('mid_vm_name'),' ',variables('meta_vm_name'),' ',variables('grid_vm_name'),' ',parameters('SASServerLicenseFile'),' ',parameters('SASGridNodeVmSize'),' ',parameters('SASLsfLicenseFile'),' ',variables('key_vault_secretname_stgacc'),' ','gridnode',' ',parameters('_artifactsLocation'),' ',parameters('numberOfSASGridNodes'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
+                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./sasappgrid_prereq.sh',' ',parameters('SASApplicationName'),' ',parameters('SASDepotFolder'),' ',parameters('fileShareName'),' ',parameters('storageAccountName'),' ',variables('domain_name'),' ',parameters('location'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',variables('mid_vm_name'),' ',variables('meta_vm_name'),' ',variables('grid_vm_name'),' ',parameters('SASServerLicenseFile'),' ',parameters('SASGridNodeVmSize'),' ',parameters('SASLsfLicenseFile'),' ',variables('key_vault_secretname_stgacc'),' ','gridnode',' ',parameters('_artifactsLocation'),' ',parameters('numberOfSASGridNodes'),' ',variables('storage_account_uri'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
                     },
                     "filepath": {
                         "value": "scripts/sasappgrid_prereq.sh"
@@ -3608,11 +3705,32 @@
             }
         },
         {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2015-06-15",
+            "name": "[concat(variables('mgt_vm_name'), '/ContentFileDownload')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('mgt_vm_name'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": "[variables('contentfileuris')]"
+                },
+                "protectedSettings": {
+                    "commandToExecute": "cp lustre* response* /tmp/"
+                }
+            }
+        },
+        {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
             "name": "Phase1-MgtHostSetup",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', variables('mgt_vm_name'))]"
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions', concat(variables('mgt_vm_name'), '/ContentFileDownload'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -3818,11 +3936,32 @@
             }
         },
         {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2015-06-15",
+            "name": "[concat(variables('mdt_vm_name'), '/ContentFileDownload')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('mdt_vm_name'))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": "[variables('contentfileuris')]"
+                },
+                "protectedSettings": {
+                    "commandToExecute": "cp lustre* response* /tmp/"
+                }
+            }
+        },
+        {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
             "name": "Phase1-MdtHostSetup",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', variables('mdt_vm_name'))]"
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions', concat(variables('mdt_vm_name'), '/ContentFileDownload'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -4081,6 +4220,33 @@
             }
         },
         {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2015-06-15",
+            "name": "[concat(variables('oss_vm_name'), copyIndex(1), '/ContentFileDownload')]",
+            "location": "[resourceGroup().location]",
+			"copy": {
+                "name": "osscontentdownloadcopy",
+                "count": "[parameters('numberOfSASGridNodes')]",
+				"mode": "serial",
+                "batchSize": 1
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Compute/virtualMachines', concat(variables('oss_vm_name'), copyIndex(1)))]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": "[variables('contentfileuris')]"
+                },
+                "protectedSettings": {
+                    "commandToExecute": "cp lustre* response* /tmp/"
+                }
+            }
+        },
+        {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
             "name": "[concat('Phase1-OSSHostSetup', copyIndex(1))]",
@@ -4089,7 +4255,7 @@
                 "count": "[parameters('numberOfLustreOSSNodes')]"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', concat(variables('oss_vm_name'), copyIndex(1)))]"
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions', concat(variables('oss_vm_name'), copyIndex(1), '/ContentFileDownload'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -4332,12 +4498,33 @@
             }
         },
         {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2015-06-15",
+            "name": "[concat(variables('microservices_vm_name'),'/ContentFileDownload')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'MicroServicesAccessPolicy')]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": "[variables('contentfileuris')]"
+                },
+                "protectedSettings": {
+                    "commandToExecute": "cp viya-ark.tar.gz /tmp/"
+                }
+            }
+        },
+        {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
             "name": "Phase1-MicroServicesHostSetup",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', variables('microservices_vm_name'))]",
-                "[resourceId('Microsoft.Resources/deployments', 'MicroServicesAccessPolicy')]"
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions', concat(variables('microservices_vm_name'),'/ContentFileDownload'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -4352,7 +4539,7 @@
                         "value": "[variables('microservices_vm_name')]"
                     },
                     "commandToExecute": {
-                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./viya_prereq.sh',' ',parameters('storageAccountName'),' ',parameters('fileShareName'),' ',parameters('viyaRepoFolder'),' ',parameters('SASApplicationName'),' ',variables('domain_name'),' ',variables('ansible_vm_name'),' ',variables('microservices_vm_name'),' ',variables('cascontroller_vm_name'),' ',variables('spre_vm_name'),' ',variables('casworker_vm_name'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',parameters('numberOfViyaCASNodes'),' ',parameters('_artifactsLocation'),' ',variables('key_vault_secretname_stgacc'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
+                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./viya_prereq.sh',' ',parameters('storageAccountName'),' ',parameters('fileShareName'),' ',parameters('viyaRepoFolder'),' ',parameters('SASApplicationName'),' ',variables('domain_name'),' ',variables('ansible_vm_name'),' ',variables('microservices_vm_name'),' ',variables('cascontroller_vm_name'),' ',variables('spre_vm_name'),' ',variables('casworker_vm_name'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',parameters('numberOfViyaCASNodes'),' ',parameters('_artifactsLocation'),' ',variables('key_vault_secretname_stgacc'),' ',variables('storage_account_uri'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
                     },
                     "filepath": {
                         "value": "scripts/viya_prereq.sh"
@@ -4575,12 +4762,33 @@
             }
         },
         {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2015-06-15",
+            "name": "[concat(variables('spre_vm_name'),'/ContentFileDownload')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'SpreAccessPolicy')]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": "[variables('contentfileuris')]"
+                },
+                "protectedSettings": {
+                    "commandToExecute": "cp viya-ark.tar.gz /tmp/"
+                }
+            }
+        },
+        {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
             "name": "Phase1-SpreHostSetup",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines',  variables('spre_vm_name'))]",
-                "[resourceId('Microsoft.Resources/deployments', 'SpreAccessPolicy')]"
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions', concat(variables('spre_vm_name'),'/ContentFileDownload'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -4595,7 +4803,7 @@
                         "value": "[variables('spre_vm_name')]"
                     },
                     "commandToExecute": {
-                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./viya_prereq.sh',' ',parameters('storageAccountName'),' ',parameters('fileShareName'),' ',parameters('viyaRepoFolder'),' ',parameters('SASApplicationName'),' ',variables('domain_name'),' ',variables('ansible_vm_name'),' ',variables('microservices_vm_name'),' ',variables('cascontroller_vm_name'),' ',variables('spre_vm_name'),' ',variables('casworker_vm_name'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',parameters('numberOfViyaCASNodes'),' ',parameters('_artifactsLocation'),' ',variables('key_vault_secretname_stgacc'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
+                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./viya_prereq.sh',' ',parameters('storageAccountName'),' ',parameters('fileShareName'),' ',parameters('viyaRepoFolder'),' ',parameters('SASApplicationName'),' ',variables('domain_name'),' ',variables('ansible_vm_name'),' ',variables('microservices_vm_name'),' ',variables('cascontroller_vm_name'),' ',variables('spre_vm_name'),' ',variables('casworker_vm_name'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',parameters('numberOfViyaCASNodes'),' ',parameters('_artifactsLocation'),' ',variables('key_vault_secretname_stgacc'),' ',variables('storage_account_uri'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
                     },
                     "filepath": {
                         "value": "scripts/viya_prereq.sh"
@@ -4825,12 +5033,33 @@
             }
         },
         {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2015-06-15",
+            "name": "[concat(variables('Cascontroller_vm_name'),'/ContentFileDownload')]",
+            "location": "[resourceGroup().location]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'CAScontrollerAccessPolicy')]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": "[variables('contentfileuris')]"
+                },
+                "protectedSettings": {
+                    "commandToExecute": "cp viya-ark.tar.gz /tmp/"
+                }
+            }
+        },
+        {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
             "name": "Phase1-CASControllerHostSetup",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines',  variables('Cascontroller_vm_name'))]",
-                "[resourceId('Microsoft.Resources/deployments', 'CAScontrollerAccessPolicy')]"
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions', concat(variables('Cascontroller_vm_name'),'/ContentFileDownload'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -4845,7 +5074,7 @@
                         "value": "[variables('Cascontroller_vm_name')]"
                     },
                     "commandToExecute": {
-                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./viya_prereq.sh',' ',parameters('storageAccountName'),' ',parameters('fileShareName'),' ',parameters('viyaRepoFolder'),' ',parameters('SASApplicationName'),' ',variables('domain_name'),' ',variables('ansible_vm_name'),' ',variables('microservices_vm_name'),' ',variables('cascontroller_vm_name'),' ',variables('spre_vm_name'),' ',variables('casworker_vm_name'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',parameters('numberOfViyaCASNodes'),' ',parameters('_artifactsLocation'),' ',variables('key_vault_secretname_stgacc'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
+                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./viya_prereq.sh',' ',parameters('storageAccountName'),' ',parameters('fileShareName'),' ',parameters('viyaRepoFolder'),' ',parameters('SASApplicationName'),' ',variables('domain_name'),' ',variables('ansible_vm_name'),' ',variables('microservices_vm_name'),' ',variables('cascontroller_vm_name'),' ',variables('spre_vm_name'),' ',variables('casworker_vm_name'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',parameters('numberOfViyaCASNodes'),' ',parameters('_artifactsLocation'),' ',variables('key_vault_secretname_stgacc'),' ',variables('storage_account_uri'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
                     },
                     "filepath": {
                         "value": "scripts/viya_prereq.sh"
@@ -5080,6 +5309,33 @@
             }
         },
         {
+            "type": "Microsoft.Compute/virtualMachines/extensions",
+            "apiVersion": "2015-06-15",
+            "name": "[concat(variables('casworker_vm_name'), copyIndex(), '/ContentFileDownload')]",
+            "location": "[resourceGroup().location]",
+			"copy": {
+                "name": "viyacontentdownloadcopy",
+                "count": "[parameters('numberOfViyaCASNodes')]",
+				"mode": "serial",
+                "batchSize": 1
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('casworker_vm_name'), copyIndex(),'accesspolicy') )]"
+            ],
+            "properties": {
+                "publisher": "Microsoft.Azure.Extensions",
+                "type": "CustomScript",
+                "typeHandlerVersion": "2.0",
+                "autoUpgradeMinorVersion": true,
+                "settings": {
+                    "fileUris": "[variables('contentfileuris')]"
+                },
+                "protectedSettings": {
+                    "commandToExecute": "cp viya-ark.tar.gz /tmp/"
+                }
+            }
+        },
+        {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
             "name": "[concat('Phase1-',variables('casworker_vm_name'), copyIndex(),'Hostsetup')]",
@@ -5089,7 +5345,7 @@
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', concat(variables('casworker_vm_name'), copyIndex()))]",
-                "[resourceId('Microsoft.Resources/deployments', concat(variables('casworker_vm_name'), copyIndex(),'accesspolicy') )]"
+                "[resourceId('Microsoft.Compute/virtualMachines/extensions', concat(variables('casworker_vm_name'), copyIndex(), '/ContentFileDownload'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -5104,7 +5360,7 @@
                         "value": "[concat(variables('casworker_vm_name'), copyIndex())]"
                     },
                     "commandToExecute": {
-                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./viya_prereq.sh',' ',parameters('storageAccountName'),' ',parameters('fileShareName'),' ',parameters('viyaRepoFolder'),' ',parameters('SASApplicationName'),' ',variables('domain_name'),' ',variables('ansible_vm_name'),' ',variables('microservices_vm_name'),' ',variables('cascontroller_vm_name'),' ',variables('spre_vm_name'),' ',variables('casworker_vm_name'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',parameters('numberOfViyaCASNodes'),' ',parameters('_artifactsLocation'),' ',variables('key_vault_secretname_stgacc'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
+                        "value": "[concat('mkdir -p /var/log/sas/install && set -o pipefail; ./viya_prereq.sh',' ',parameters('storageAccountName'),' ',parameters('fileShareName'),' ',parameters('viyaRepoFolder'),' ',parameters('SASApplicationName'),' ',variables('domain_name'),' ',variables('ansible_vm_name'),' ',variables('microservices_vm_name'),' ',variables('cascontroller_vm_name'),' ',variables('spre_vm_name'),' ',variables('casworker_vm_name'),' ',variables('key_vault_secretname_sasinst'),' ',variables('key_vault_secretname_sasext'),' ',variables('key_vault_name'),' ',variables('key_vault_secretname_pvtkey'),' ',variables('key_vault_secretname_pubkey'),' ',parameters('numberOfViyaCASNodes'),' ',parameters('_artifactsLocation'),' ',variables('key_vault_secretname_stgacc'),' ',variables('storage_account_uri'),' ','2>&1 | tee /var/log/sas/install/runPhase1_HostSetup.log')]"
                     },
                     "filepath": {
                         "value": "scripts/viya_prereq.sh"

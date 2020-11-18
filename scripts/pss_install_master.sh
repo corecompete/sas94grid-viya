@@ -21,9 +21,10 @@ mid_hostname=`facter mid_hostname`
 SASInstallLoc="/opt/sas"
 lsf_sid=`facter lsf_sid`
 sas_lustre_dir="/opt/sas"
-sas_resource_dir="/opt/sas/resources"
+res_dir="/opt/sas/resources/responsefiles"
+resource_dir="/opt/sas/resources"
 artifact_loc=`facter artifact_loc`
-lsf_install_config_url=${artifact_loc}properties/lsf_install.config
+#lsf_install_config_url=${artifact_loc}properties/lsf_install.config
 GridInstallTempLoc="$SASInstallLoc/platform/tmp"
 LSFInstallLoc="$SASInstallLoc/platform/lsf"
 PMInstallLoc="$SASInstallLoc/platform/pm"
@@ -75,7 +76,7 @@ fail_if_error $? "ERROR: kernel package installation failed."
 echo "Downloading and installing lustre packages "
 mkdir -p /tmp/lustre_package
 cd /tmp/lustre_package
-wget ${artifact_loc}lustre_rpm_packages/lustre_packages.zip
+cp -p /tmp/lustre_packages.zip /tmp/lustre_package/
 unzip lustre_packages.zip
 yum localinstall lustre-client-2.12.4-1.el7.x86_64.rpm kmod-lustre-client-2.12.4-1.el7.x86_64.rpm -y
 fail_if_error $? "ERROR: Client installation failed."
@@ -98,11 +99,17 @@ chmod 777 /opt/sas
 ### Lustre client installation completed
 
 ## Creating the directory structure
-if [ -d $sas_resource_dir ]; then
-   chown sasinst:sas $sas_resource_dir
+if [ -d $resource_dir ]; then
+   chown sasinst:sas $resource_dir
 else
-   mkdir -p $sas_resource_dir
-   chown sasinst:sas $sas_resource_dir
+   mkdir -p $resource_dir
+   chown sasinst:sas $resource_dir
+fi
+if [ -d $res_dir ]; then
+   chown sasinst:sas $res_dir
+else
+   mkdir -p $res_dir
+   chown sasinst:sas $res_dir
 fi
 
 if [ -d $sas_lustre_dir/$sas_role/config ]; then
@@ -145,18 +152,20 @@ chown sasinst:sas $sas_lustre_dir -R
 
 
 #Downloading the lsf_install.config file
-wget -P $sas_resource_dir $lsf_install_config_url
+tar -xzvf /tmp/response-properties.tar.gz -C ${res_dir}
+cp -p ${res_dir}/lsf_install.config ${resource_dir}
+chown -R sasinst:sas ${resource_dir}
 
-sed -i "s/domain_name/${Domain}/g" $sas_resource_dir/lsf_install.config
-sed -i "s/grid_host/$grid_hostname/g" $sas_resource_dir/lsf_install.config
-sed -i "s/mid_host/$mid_hostname/g" $sas_resource_dir/lsf_install.config
-sed -i "s|pminstallloc|$PMInstallLoc|g" $sas_resource_dir/lsf_install.config
-sed -i "s|lsfinstallloc|$LSFInstallLoc|g" $sas_resource_dir/lsf_install.config
+sed -i "s/domain_name/${Domain}/g" $resource_dir/lsf_install.config
+sed -i "s/grid_host/$grid_hostname/g" $resource_dir/lsf_install.config
+sed -i "s/mid_host/$mid_hostname/g" $resource_dir/lsf_install.config
+sed -i "s|pminstallloc|$PMInstallLoc|g" $resource_dir/lsf_install.config
+sed -i "s|lsfinstallloc|$LSFInstallLoc|g" $resource_dir/lsf_install.config
 
 i=1
 gridhostname=""
 if [ $count == 0 ]; then
-   sed -i "s/gridnodes//g" $sas_resource_dir/lsf_install.config
+   sed -i "s/gridnodes//g" $resource_dir/lsf_install.config
 else
    while [ "$count" != "0" ] ; do
       #echo grid0$i.$Domain
@@ -164,7 +173,7 @@ else
       i=$(($i+1))
       count=$(($count-1))
    done
-   sed -i "s/gridnodes/$gridhostname/g" $sas_resource_dir/lsf_install.config
+   sed -i "s/gridnodes/$gridhostname/g" $resource_dir/lsf_install.config
 fi
 
 
@@ -173,7 +182,7 @@ cp /sasdepot/$SASSoftwareDepo/third_party/Platform_Process_Manager/*/Linux_for_x
 cp /sasdepot/$SASSoftwareDepo/third_party/Platform_Grid_Management_Service/*/Linux_for_x64/gms*.tar.Z $GridInstallTempLoc
 PMInstallTemp=`tar xvf $GridInstallTempLoc/*.tar -C $GridInstallTempLoc | tail -n 1 | cut -d '/' -f 2`
 cp /sasdepot/$SASSoftwareDepo/sid_files/$lsf_sid $GridInstallTempLoc/$PMInstallTemp/license.dat
-cp $sas_resource_dir/lsf_install.config $GridInstallTempLoc/$PMInstallTemp/install.config
+cp $resource_dir/lsf_install.config $GridInstallTempLoc/$PMInstallTemp/install.config
 
 
 #LSF and PM install on Master only

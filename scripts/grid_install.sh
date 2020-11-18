@@ -29,22 +29,22 @@ sasint_secret_name=`facter sasint_secret_name`
 sasext_secret_name=`facter sasext_secret_name`
 key_vault_name=`facter key_vault_name`
 pub_keyname=`facter pub_keyname`
-plan_file_url=${artifact_loc}properties/plan.xml
-gridinstall_url=${artifact_loc}properties/grid_install.properties
-gridconfig_url=${artifact_loc}properties/grid_config.properties
+#plan_file_url=${artifact_loc}properties/plan.xml
+#gridinstall_url=${artifact_loc}properties/grid_install.properties
+#gridconfig_url=${artifact_loc}properties/grid_config.properties
+resource_dir=/opt/sas/resources
 res_dir="/opt/sas/resources/responsefiles"
 sas_local_dir="/opt/sas/grid" 
-inst_prop=$res_dir/grid_install.properties
-conf_prop=$res_dir/grid_config.properties
-sas_resource_dir=/opt/sas/resources
+inst_prop=$resource_dir/grid_install.properties
+conf_prop=$resource_dir/grid_config.properties
 
 
 ## Creating the directory structure
-if [ -d $sas_resource_dir ]; then
-   chown sasinst:sas $sas_resource_dir
+if [ -d $resource_dir ]; then
+   chown sasinst:sas $resource_dir
 else
-   mkdir -p $sas_resource_dir
-   chown sasinst:sas $sas_resource_dir
+   mkdir -p $resource_dir
+   chown sasinst:sas $resource_dir
 fi
 
 if [ ! -d $sas_local_dir ]; then
@@ -81,18 +81,20 @@ if [ ! -d $res_dir ]; then
     mkdir -p $res_dir
 fi
 
-#Downloading the plan file and property files required for SAS install
-wget -P /opt/sas/resources/ $plan_file_url
-wget -P $res_dir $gridinstall_url
-wget -P $res_dir $gridconfig_url
+
+#Extracting the plan file and property files required for SAS install
+#tar -xzvf /tmp/response-properties.tar.gz -C ${res_dir}
+cp -p ${res_dir}/plan.xml ${resource_dir}
+cp -p ${res_dir}/grid_* ${resource_dir}
+chown -R sasinst:sas ${resource_dir}
 
 #Altering the property files
-sed -i "s/domain_name/${domain_name}/g" $res_dir/*.properties
-sed -i "s/host_name/${grid_host}/g" $res_dir/*.properties
-sed -i "s/meta_host/${meta_host}/g" $res_dir/*.properties
-sed -i "s/mid_host/${mid_host}/g" $res_dir/*.properties
-sed -i "s|sas_plan_file_path|/opt/sas/resources/plan.xml|g" $res_dir/*.properties
-sed -i "s|sas_license_file_path|/opt/sas/resources/${grid_sid}|g" $res_dir/*.properties
+sed -i "s/domain_name/${domain_name}/g" $resource_dir/*.properties
+sed -i "s/host_name/${grid_host}/g" $resource_dir/*.properties
+sed -i "s/meta_host/${meta_host}/g" $resource_dir/*.properties
+sed -i "s/mid_host/${mid_host}/g" $resource_dir/*.properties
+sed -i "s|sas_plan_file_path|/opt/sas/resources/plan.xml|g" $resource_dir/*.properties
+sed -i "s|sas_license_file_path|/opt/sas/resources/${grid_sid}|g" $resource_dir/*.properties
 
 #SAS Installation
 if [ -d /var/temp ]; then

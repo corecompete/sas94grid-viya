@@ -21,7 +21,7 @@ playbook_directory="$ansible_directory/sas_viya_playbook"
 inventory="$playbook_directory/inventory.ini"
 viyarepo_loc=`facter viyarepo_folder`
 artifact_loc=`facter artifact_loc`
-viya_ark_uri=${artifact_loc}viya-ark.tar.gz
+viya_ark_uri=${artifact_loc}properties/viya-ark.tar.gz
 
 if [[ -z "$SCRIPT_PHASE" ]]; then
         SCRIPT_PHASE="$1"
@@ -52,9 +52,11 @@ if [[ "$SCRIPT_PHASE" -eq 1 ]]; then
 #
 ##altering Ansible Config
 sed -i '/action_plugins/a host_key_checking = False' $playbook_directory/ansible.cfg
+
 #
 ##Altering the Vars file 
 #
+
 sed -i "s~#CAS_DISK_CACHE~CAS_DISK_CACHE~" $playbook_directory/vars.yml
 sed -i "s~/tmp~/cascache~" $playbook_directory/vars.yml
 sed -i "/#CAS_VIRTUAL_PORT/ a newline" $playbook_directory/vars.yml
@@ -115,10 +117,11 @@ cd $playbook_directory && ansible-playbook system-assessment.yml -i inventory.in
 elif [[ "$SCRIPT_PHASE" -eq 2 ]]; then
          mkdir /.ssh && touch /.ssh/known_hosts 
         cd $playbook_directory && ansible-playbook install-only.yml -i inventory.ini -vvv
+        echo "*** Phase 5 Part 2 - Viya Install only ended at `date +'%Y-%m-%d_%H-%M-%S'` ***"
 
 elif [[ "$SCRIPT_PHASE" -eq 3 ]]; then
-
         cd $playbook_directory && ansible-playbook site.yml -i inventory.ini -vvv
+        echo "*** Phase 5 Part 3 - Viya Configuration ended at `date +'%Y-%m-%d_%H-%M-%S'` ***"
 
 elif [[ "$SCRIPT_PHASE" -eq 4 ]]; then
         wget $viya_ark_uri
@@ -151,5 +154,5 @@ echo `ssh -o StrictHostKeyChecking=no $app_name$microservices_vm_name "grep -H -
 sasboot=`ssh -o StrictHostKeyChecking=no $app_name$microservices_vm_name "grep -H -r "sasboot" /var/log/sas/viya/saslogon/default/sas-saslogon*  | sed 's/.*code=//'"`
 echo "{'SAS_BOOT': '$sasboot'}" > /var/log/sas/install/sasboot.log
 echo "#SASBOOT#"
-cat /var/log/sas/install/sasboot.log 
+cat /var/log/sas/install/sasboot.log
 fi

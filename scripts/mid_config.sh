@@ -15,26 +15,29 @@ app_name=`facter application_name`
 artifact_loc=`facter artifact_loc`
 depot_loc=`facter sasdepot_folder`
 res_dir="/opt/sas/resources/responsefiles"
-ssl_prop_url=${artifact_loc}properties/ssl_cert.properties
-conf_prop=${res_dir}/mid_config.properties
-cert_prop=${res_dir}/ssl_cert.properties
+resource_dir="/opt/sas/resources"
+#ssl_prop_url=${artifact_loc}properties/ssl_cert.properties
+conf_prop=${resource_dir}/mid_config.properties
+cert_prop=${resource_dir}/ssl_cert.properties
 
 ##Create VMWare Directories
 mkdir -p /etc/opt/vmware/vfabric/
 chown sasinst:sas /etc/opt/vmware -R
 
 ##Downloading the ssl properties files
-wget -P $res_dir $ssl_prop_url
+
+cp -p ${res_dir}/ssl_cert.properties ${resource_dir}
+
 ##changing the ssl setting in properties file
 sed -i "s|certname|${app_name}|g" $cert_prop
 sed -i "s|certname|${app_name}|g" $conf_prop
 
 ## Password Update
 encsasextpw=$(</root/encext.txt)
-sed -i "s/changeextpass/${encsasextpw}/g" $res_dir/*.properties
+sed -i "s/changeextpass/${encsasextpw}/g" $resource_dir/*.properties
 echo "Encrypted password has been updated successfully."
 encsasintpw=$(</root/encint.txt)
-sed -i "s/changeintpass/${encsasintpw}/g" $res_dir/*.properties
+sed -i "s/changeintpass/${encsasintpw}/g" $resource_dir/*.properties
 echo "Encrypted password has been updated succesfully."
 rm -f /root/enc*.txt
 

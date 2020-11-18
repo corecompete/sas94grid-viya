@@ -45,6 +45,7 @@ secret_pub_keyname=${15}
 cas_nodes=${16}
 artifact_loc=${17}
 stgacc_secr_name=${18}
+cifs_server_fqdn=${19}
 EOF
 
 
@@ -58,7 +59,7 @@ if ! type -p ansible;  then
    # install Ansible
     curl --retry 10 --max-time 60 --fail --silent --show-error "https://bootstrap.pypa.io/get-pip.py" -o "get-pip.py"
     sudo python get-pip.py
-    pip install 'ansible==2.7.10'
+    pip install 'ansible==2.8.3'
     fail_if_error $? "Error: Ansible client installation is failed"
 fi
 
@@ -253,7 +254,7 @@ az login --identity
 fail_if_error $? "Error: Az login Failed"
 azure_storage_files_password=`az keyvault secret show -n $stgacc_secr_name --vault-name $key_vault_name | grep value | cut -d '"' -f4`
 echo "setup cifs"
-cifs_server_fqdn="${azure_storage_account}.file.core.windows.net"
+cifs_server_fqdn=`facter cifs_server_fqdn`
 
 if [ ! -d "/etc/smbcredentials" ]; then
     sudo mkdir /etc/smbcredentials
@@ -268,7 +269,5 @@ chmod 600 "/etc/smbcredentials/${azure_storage_account}.cred"
 mkdir -p "/${DIRECTORY_NFS_SHARE}"
 mount -t cifs //${cifs_server_fqdn}/${azure_storage_files_share} /${DIRECTORY_NFS_SHARE}  -o vers=3.0,credentials=/etc/smbcredentials/${azure_storage_account}.cred,dir_mode=0777,file_mode=0777,serverino
 fail_if_error $? "Error: SAS Depot Mount Failed"
-#echo "//${cifs_server_fqdn}/${azure_storage_files_share} /${DIRECTORY_NFS_SHARE}  cifs defaults,vers=3.0,credentials=/etc/smbcredentials/${azure_storage_account}.cred,dir_mode=0777,file_mode=0777,sec=ntlmssp 0 0" >> /etc/fstab
-#mount -a
 
 echo "*** Phase 1 - Pre-Reqs Script Ended at `date +'%Y-%m-%d_%H-%M-%S'` ***"

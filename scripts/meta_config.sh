@@ -15,18 +15,19 @@ fail_if_error() {
 app_name=`facter application_name`
 artifact_loc=`facter artifact_loc`
 depot_loc=`facter sasdepot_folder`
+resource_dir="/opt/sas/resources"
 res_dir="/opt/sas/resources/responsefiles"
-ssl_prop_url=${artifact_loc}properties/ssl_cert.properties
-inst_prop=${res_dir}/meta_install.properties
-conf_prop=${res_dir}/meta_config.properties
-cert_prop=${res_dir}/ssl_cert.properties
+inst_prop=${resource_dir}/meta_install.properties
+conf_prop=${resource_dir}/meta_config.properties
+cert_prop=${resource_dir}/ssl_cert.properties
 sas_role=`facter sas_role`
 domain_name=`facter domain_name` 
 
 #Downloading SAS SSL properties file
-wget -P $res_dir $ssl_prop_url
+cp -p ${res_dir}/ssl_cert.properties ${resource_dir}
+
 ##Altering the certificate in property file
-sed -i "s|certname|${app_name}|g" ${res_dir}/ssl_cert.properties
+sed -i "s|certname|${app_name}|g" ${resource_dir}/ssl_cert.properties
 
 
 #Add certificate to trustedstore

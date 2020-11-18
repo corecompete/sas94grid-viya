@@ -29,12 +29,12 @@ key_vault_name=`facter key_vault_name`
 pub_keyname=`facter pub_keyname`
 artifact_loc=`facter artifact_loc`
 res_dir="/opt/sas/resources/responsefiles"
-plan_file_url="${artifact_loc}properties/plan.xml"
-midinstall_url="${artifact_loc}properties/mid_install.properties"
-midconfig_url="${artifact_loc}properties/mid_config.properties"
-inst_prop=${res_dir}/mid_install.properties
-conf_prop=${res_dir}/mid_config.properties
-sas_resource_dir=/opt/sas/resources
+resource_dir="/opt/sas/resources"
+#plan_file_url="${artifact_loc}properties/plan.xml"
+#midinstall_url="${artifact_loc}properties/mid_install.properties"
+#midconfig_url="${artifact_loc}properties/mid_config.properties"
+inst_prop=${resource_dir}/mid_install.properties
+conf_prop=${resource_dir}/mid_config.properties
 sas_local_dir="/usr/local"
 
 # Getting the password
@@ -80,7 +80,7 @@ fail_if_error $? "ERROR: kernel package installation failed."
 echo "Downloading and installing lustre packages "
 mkdir -p /tmp/lustre_package
 cd /tmp/lustre_package
-wget ${artifact_loc}lustre_rpm_packages/lustre_packages.zip
+cp -p /tmp/lustre_packages.zip /tmp/lustre_package
 unzip lustre_packages.zip
 yum localinstall lustre-client-2.12.4-1.el7.x86_64.rpm kmod-lustre-client-2.12.4-1.el7.x86_64.rpm -y
 fail_if_error $? "ERROR: Client installation failed."
@@ -103,11 +103,11 @@ chmod 777 /opt/sas
 ### Lustre client installation completed
 
 ## Creating the directory structure
-if [ -d $sas_resource_dir ]; then
-   chown sasinst:sas $sas_resource_dir
+if [ -d $resource_dir ]; then
+   chown sasinst:sas $resource_dir
 else
-   mkdir -p $sas_resource_dir
-   chown sasinst:sas $sas_resource_dir
+   mkdir -p $resource_dir
+   chown sasinst:sas $resource_dir
 fi
 
 if [ ! -d $sas_local_dir ]; then
@@ -149,16 +149,20 @@ cp -rv /sasdepot/${depot_loc}/sid_files/${sas_sid} /opt/sas/resources/
 if [ ! -d $res_dir ]; then
     mkdir -p $res_dir
 fi
-wget -P /opt/sas/resources/ $plan_file_url
-wget -P $res_dir $midinstall_url
-wget -P $res_dir $midconfig_url
+
+#Extracting the plan file and property files required for SAS install
+tar -xzvf /tmp/response-properties.tar.gz -C ${res_dir}
+cp -p ${res_dir}/plan.xml ${resource_dir}
+cp -p ${res_dir}/mid_* ${resource_dir}
+chown -R sasinst:sas ${resource_dir}
+
 
 #Changing the settings in property files
-sed -i "s/domain_name/${domain_name}/g" $res_dir/*.properties
-sed -i "s/host_name/${mid_host}/g" $res_dir/*.properties
-sed -i "s/meta_host/${meta_host}/g" $res_dir/*.properties
-sed -i "s|sas_plan_file_path|/opt/sas/resources/plan.xml|g" $res_dir/*.properties
-sed -i "s|sas_license_file_path|/opt/sas/resources/${sas_sid}|g" $res_dir/*.properties
+sed -i "s/domain_name/${domain_name}/g" $resource_dir/*.properties
+sed -i "s/host_name/${mid_host}/g" $resource_dir/*.properties
+sed -i "s/meta_host/${meta_host}/g" $resource_dir/*.properties
+sed -i "s|sas_plan_file_path|/opt/sas/resources/plan.xml|g" $resource_dir/*.properties
+sed -i "s|sas_license_file_path|/opt/sas/resources/${sas_sid}|g" $resource_dir/*.properties
 
 #SAS Installation
 if [ -d /var/temp ]; then

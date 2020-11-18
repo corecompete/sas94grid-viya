@@ -80,7 +80,7 @@ fail_if_error $? "ERROR: Dependency packages installation failed."
 # Downloading all the rpm packegs required for the lustre
 mkdir -p  /opt/lustre-temp/
 cd /opt/lustre-temp/
-wget ${artifact_loc}lustre_rpm_packages/lustre_packages.zip
+cp -p /tmp/lustre_packages.zip /opt/lustre-temp/
 unzip lustre_packages.zip
 
 echo "Downloading and installing kernel dependency packages"
