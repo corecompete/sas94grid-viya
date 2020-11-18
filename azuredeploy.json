@@ -2477,8 +2477,8 @@
             "apiVersion": "2019-10-01",
             "name": "Phase1-MetaHostSetup",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', variables('meta_vm_name'))]",
-                "[resourceId('Microsoft.Compute/virtualMachines/extensions', concat(variables('meta_vm_name'),'/ContentFileDownload'))]"
+                "[resourceId('Microsoft.Compute/virtualMachines', variables('meta_vm_name'))]"
+                
             ],
             "properties": {
                 "mode": "Incremental",
