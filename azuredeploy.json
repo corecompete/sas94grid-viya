@@ -1996,6 +1996,7 @@
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', variables('ansible_vm_name'))]",
                 "[resourceId('Microsoft.Resources/deployments','Phase2-MetaInstall')]",
+                "[resourceId('Microsoft.Resources/deployments','Phase4-ViyaInstallpart2')]",
                 "sasnodepsscopy"
             ],
             "properties": {
@@ -2103,7 +2104,7 @@
             "apiVersion": "2019-10-01",
             "name": "Phase5-ViyaInstallpart3",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', 'Phase4-ViyaInstallpart2')]"
+                "[resourceId('Microsoft.Resources/deployments', 'Phase2-AnsibleSSLCopy')]"
             ],
             "properties": {
                 "mode": "Incremental",
