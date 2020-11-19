@@ -303,12 +303,6 @@
             "get",
             "list"
         ],
-        "contentfileuris": [
-            "[uri(parameters('_artifactsLocation'), concat('properties/response-properties.tar.gz', parameters('_artifactsLocationSasToken')))]",
-            "[uri(parameters('_artifactsLocation'), concat('properties/viya-ark.tar.gz', parameters('_artifactsLocationSasToken')))]",
-            "[uri(parameters('_artifactsLocation'), concat('lustrepackages/lustre_packages.zip', parameters('_artifactsLocationSasToken')))]",
-            "[uri(parameters('_artifactsLocation'), concat('lustrepackages/lustre_server_pkg.zip', parameters('_artifactsLocationSasToken')))]"
-        ],
         "custom_data_cas": "#cloud-config\n mounts:\n   - [ ephemeral0, /cascache]",
         "custom_data_sas": "#cloud-config\n mounts:\n   - [ ephemeral0, /saswork]",
         "diagnostic_storagegroup_name": "[toLower(concat(parameters('SASApplicationName'),'diag', variables('resourceGroupUniqueString')))]",
@@ -2254,9 +2248,44 @@
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
-            "name": "Phase1-SASClientInstall",
+            "name": "RDPContentFileDownload",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', variables('rdp_vm_name'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('windows_extension_template')]",
+                    "contentVersion": "1.0.0.0"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "vmName": {
+                        "value": "[variables('rdp_vm_name')]"
+                    },
+                    "commandToExecute": {
+                        "value": "powershell.exe Expand-Archive -LiteralPath client_install.zip -Destination C:\\WindowsAzure\\client_install"
+                    },
+                    "filepath": {
+                        "value": "client_install.zip"
+                    },
+                    "_artifactsLocation": {
+                        "value": "[parameters('_artifactsLocation')]"
+                    },
+                    "_artifactsLocationSasToken": {
+                        "value": "[parameters('_artifactsLocationSasToken')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "Phase1-SASClientInstall",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', 'RDPContentFileDownload')]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -2485,7 +2514,6 @@
                 }
             }
         },
-
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
@@ -2760,25 +2788,70 @@
             }
         },
         {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "name": "[concat(variables('grid_vm_name'), '/', 'InitStartup')]",
-            "apiVersion": "2017-12-01",
-            "location": "[parameters('location')]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "[concat(variables('grid_vm_name'),'ContentFileDownload')]",
             "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', variables('grid_vm_name'))]",
-                "[resourceId('Microsoft.Resources/deployments','GridAccessPolicy')]"
+                "[resourceId('Microsoft.Resources/deployments', 'GridAccessPolicy')]"
             ],
             "properties": {
-                "publisher": "Microsoft.Azure.Extensions",
-                "type": "CustomScript",
-                "typeHandlerVersion": "2.0",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                    "fileUris": "[variables('contentfileuris')]"
-                    
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('linux_extension_template')]"
                 },
-                "protectedSettings": {
-                    "commandToExecute": "cp lustre* response* /tmp/"
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "vmName": {
+                        "value": "[variables('grid_vm_name')]"
+                    },
+                    "commandToExecute": {
+                        "value": "cp response-properties.tar.gz /tmp"
+                    },
+                    "filepath": {
+                        "value": "properties/response-properties.tar.gz"
+                    },
+                    "_artifactsLocation": {
+                        "value": "[parameters('_artifactsLocation')]"
+                    },
+                    "_artifactsLocationSasToken": {
+                        "value": "[parameters('_artifactsLocationSasToken')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "[concat(variables('grid_vm_name'),'ContentFile1Download')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('grid_vm_name'),'ContentFileDownload'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('linux_extension_template')]"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "vmName": {
+                        "value": "[variables('grid_vm_name')]"
+                    },
+                    "commandToExecute": {
+                        "value": "cp lustre_packages.zip /tmp"
+                    },
+                    "filepath": {
+                        "value": "lustrepackages/lustre_packages.zip"
+                    },
+                    "_artifactsLocation": {
+                        "value": "[parameters('_artifactsLocation')]"
+                    },
+                    "_artifactsLocationSasToken": {
+                        "value": "[parameters('_artifactsLocationSasToken')]"
+                    }
                 }
             }
         },
@@ -2787,7 +2860,7 @@
             "apiVersion": "2019-10-01",
             "name": "Phase1-GridHostSetup",
             "dependsOn": [
-                "[concat('Microsoft.Compute/virtualMachines/', variables('grid_vm_name'), '/extensions/', 'InitStartup')]"
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('grid_vm_name'),'ContentFile1Download'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -3157,23 +3230,70 @@
             }
         },
         {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "apiVersion": "2015-06-15",
-            "name": "[concat(variables('mid_vm_name'),'/ContentFileDownload')]",
-            "location": "[resourceGroup().location]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "[concat(variables('mid_vm_name'),'ContentFileDownload')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', 'MidAccessPolicy')]"
             ],
             "properties": {
-                "publisher": "Microsoft.Azure.Extensions",
-                "type": "CustomScript",
-                "typeHandlerVersion": "2.0",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                    "fileUris": "[variables('contentfileuris')]"
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('linux_extension_template')]"
                 },
-                "protectedSettings": {
-                    "commandToExecute": "cp lustre* response* /tmp/"
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "vmName": {
+                        "value": "[variables('mid_vm_name')]"
+                    },
+                    "commandToExecute": {
+                        "value": "cp response-properties.tar.gz /tmp"
+                    },
+                    "filepath": {
+                        "value": "properties/response-properties.tar.gz"
+                    },
+                    "_artifactsLocation": {
+                        "value": "[parameters('_artifactsLocation')]"
+                    },
+                    "_artifactsLocationSasToken": {
+                        "value": "[parameters('_artifactsLocationSasToken')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "[concat(variables('mid_vm_name'),'ContentFile1Download')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('mid_vm_name'),'ContentFileDownload'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('linux_extension_template')]"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "vmName": {
+                        "value": "[variables('mid_vm_name')]"
+                    },
+                    "commandToExecute": {
+                        "value": "cp lustre_packages.zip /tmp"
+                    },
+                    "filepath": {
+                        "value": "lustrepackages/lustre_packages.zip"
+                    },
+                    "_artifactsLocation": {
+                        "value": "[parameters('_artifactsLocation')]"
+                    },
+                    "_artifactsLocationSasToken": {
+                        "value": "[parameters('_artifactsLocationSasToken')]"
+                    }
                 }
             }
         },
@@ -3182,8 +3302,8 @@
             "apiVersion": "2019-10-01",
             "name": "Phase1-MidHostsetup",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines',variables('mid_vm_name'))]",
-                "[concat('Microsoft.Compute/virtualMachines/', variables('mid_vm_name'), '/extensions/', 'ContentFileDownload')]"
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('mid_vm_name'),'ContentFile1Download'))]"
+
             ],
             "properties": {
                 "mode": "Incremental",
@@ -3470,12 +3590,11 @@
             }
         },
         {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "apiVersion": "2015-06-15",
-            "name": "[concat(variables('gridnode_vm_name'), copyIndex(1), '/ContentFileDownload')]",
-            "location": "[resourceGroup().location]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "[concat(variables('gridnode_vm_name'), copyIndex(1), 'ContentFileDownload')]",
             "copy": {
-                "name": "contentdownloadcopy",
+                "name": "filecopy",
                 "count": "[parameters('numberOfSASGridNodes')]",
                 "mode": "serial",
                 "batchSize": 1
@@ -3484,15 +3603,69 @@
                 "[resourceId('Microsoft.Resources/deployments', concat('GridNode-AccessPolicy', copyIndex(1)))]"
             ],
             "properties": {
-                "publisher": "Microsoft.Azure.Extensions",
-                "type": "CustomScript",
-                "typeHandlerVersion": "2.0",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                    "fileUris": "[variables('contentfileuris')]"
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('linux_extension_template')]"
                 },
-                "protectedSettings": {
-                    "commandToExecute": "cp lustre* response* /tmp/"
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "vmName": {
+                        "value": "[concat(variables('gridnode_vm_name'), copyIndex(1))]"
+                    },
+                    "commandToExecute": {
+                        "value": "cp response-properties.tar.gz /tmp"
+                    },
+                    "filepath": {
+                        "value": "properties/response-properties.tar.gz"
+                    },
+                    "_artifactsLocation": {
+                        "value": "[parameters('_artifactsLocation')]"
+                    },
+                    "_artifactsLocationSasToken": {
+                        "value": "[parameters('_artifactsLocationSasToken')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "[concat(variables('gridnode_vm_name'), copyIndex(1), 'ContentFile1Download')]",
+            "copy": {
+                "name": "file1copy",
+                "count": "[parameters('numberOfSASGridNodes')]",
+                "mode": "serial",
+                "batchSize": 1
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('gridnode_vm_name'), copyIndex(1), 'ContentFileDownload'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('linux_extension_template')]"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "vmName": {
+                        "value": "[concat(variables('gridnode_vm_name'), copyIndex(1))]"
+                    },
+                    "commandToExecute": {
+                        "value": "cp lustre_packages.zip /tmp"
+                    },
+                    "filepath": {
+                        "value": "lustrepackages/lustre_packages.zip"
+                    },
+                    "_artifactsLocation": {
+                        "value": "[parameters('_artifactsLocation')]"
+                    },
+                    "_artifactsLocationSasToken": {
+                        "value": "[parameters('_artifactsLocationSasToken')]"
+                    }
                 }
             }
         },
@@ -3505,8 +3678,7 @@
                 "count": "[parameters('numberOfSASGridNodes')]"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines',concat(variables('gridnode_vm_name'), copyIndex(1)))]",
-                "contentdownloadcopy"
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('gridnode_vm_name'), copyIndex(1), 'ContentFile1Download'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -3720,23 +3892,70 @@
             }
         },
         {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "apiVersion": "2015-06-15",
-            "name": "[concat(variables('mgt_vm_name'), '/InitStartup')]",
-            "location": "[resourceGroup().location]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "[concat(variables('mgt_vm_name'), 'ContentFileDownload')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', variables('mgt_vm_name'))]"
             ],
             "properties": {
-                "publisher": "Microsoft.Azure.Extensions",
-                "type": "CustomScript",
-                "typeHandlerVersion": "2.0",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                    "fileUris": "[variables('contentfileuris')]"
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('linux_extension_template')]"
                 },
-                "protectedSettings": {
-                    "commandToExecute": "cp lustre* response* /tmp/"
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "vmName": {
+                        "value": "[variables('mgt_vm_name')]"
+                    },
+                    "commandToExecute": {
+                        "value": "cp lustre_packages.zip /tmp"
+                    },
+                    "filepath": {
+                        "value": "lustrepackages/lustre_packages.zip"
+                    },
+                    "_artifactsLocation": {
+                        "value": "[parameters('_artifactsLocation')]"
+                    },
+                    "_artifactsLocationSasToken": {
+                        "value": "[parameters('_artifactsLocationSasToken')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "[concat(variables('mgt_vm_name'), 'ContentFile1Download')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('mgt_vm_name'), 'ContentFileDownload'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('linux_extension_template')]"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "vmName": {
+                        "value": "[variables('mgt_vm_name')]"
+                    },
+                    "commandToExecute": {
+                        "value": "cp lustre_server_pkg.zip /tmp"
+                    },
+                    "filepath": {
+                        "value": "lustrepackages/lustre_server_pkg.zip"
+                    },
+                    "_artifactsLocation": {
+                        "value": "[parameters('_artifactsLocation')]"
+                    },
+                    "_artifactsLocationSasToken": {
+                        "value": "[parameters('_artifactsLocationSasToken')]"
+                    }
                 }
             }
         },
@@ -3745,8 +3964,7 @@
             "apiVersion": "2019-10-01",
             "name": "Phase1-MgtHostSetup",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', variables('mgt_vm_name'))]",
-                "[concat('Microsoft.Compute/virtualMachines/', variables('mgt_vm_name'), '/extensions/', 'InitStartup')]"
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('mgt_vm_name'), 'ContentFile1Download'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -3952,23 +4170,70 @@
             }
         },
         {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "apiVersion": "2015-06-15",
-            "name": "[concat(variables('mdt_vm_name'), '/ContentFileDownload')]",
-            "location": "[resourceGroup().location]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "[concat(variables('mdt_vm_name'), 'ContentFileDownload')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', variables('mdt_vm_name'))]"
             ],
             "properties": {
-                "publisher": "Microsoft.Azure.Extensions",
-                "type": "CustomScript",
-                "typeHandlerVersion": "2.0",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                    "fileUris": "[variables('contentfileuris')]"
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('linux_extension_template')]"
                 },
-                "protectedSettings": {
-                    "commandToExecute": "cp lustre* response* /tmp/"
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "vmName": {
+                        "value": "[variables('mdt_vm_name')]"
+                    },
+                    "commandToExecute": {
+                        "value": "cp lustre_packages.zip /tmp"
+                    },
+                    "filepath": {
+                        "value": "lustrepackages/lustre_packages.zip"
+                    },
+                    "_artifactsLocation": {
+                        "value": "[parameters('_artifactsLocation')]"
+                    },
+                    "_artifactsLocationSasToken": {
+                        "value": "[parameters('_artifactsLocationSasToken')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "[concat(variables('mdt_vm_name'), 'ContentFile1Download')]",
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('mdt_vm_name'), 'ContentFileDownload'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('linux_extension_template')]"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "vmName": {
+                        "value": "[variables('mdt_vm_name')]"
+                    },
+                    "commandToExecute": {
+                        "value": "cp lustre_server_pkg.zip /tmp"
+                    },
+                    "filepath": {
+                        "value": "lustrepackages/lustre_server_pkg.zip"
+                    },
+                    "_artifactsLocation": {
+                        "value": "[parameters('_artifactsLocation')]"
+                    },
+                    "_artifactsLocationSasToken": {
+                        "value": "[parameters('_artifactsLocationSasToken')]"
+                    }
                 }
             }
         },
@@ -3977,8 +4242,7 @@
             "apiVersion": "2019-10-01",
             "name": "Phase1-MdtHostSetup",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', variables('mdt_vm_name'))]",
-                "[concat('Microsoft.Compute/virtualMachines/', variables('mdt_vm_name'), '/extensions/', 'ContentFileDownload')]"
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('mdt_vm_name'), 'ContentFile1Download'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -4237,13 +4501,12 @@
             }
         },
         {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "apiVersion": "2015-06-15",
-            "name": "[concat(variables('oss_vm_name'), copyIndex(1), '/ContentFileDownload')]",
-            "location": "[resourceGroup().location]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "[concat(variables('oss_vm_name'), copyIndex(1), 'ContentFileDownload')]",
             "copy": {
-                "name": "osscontentdownloadcopy",
-                "count": "[parameters('numberOfSASGridNodes')]",
+                "name": "ossfilecopy",
+                "count": "[parameters('numberOfLustreOSSNodes')]",
                 "mode": "serial",
                 "batchSize": 1
             },
@@ -4251,15 +4514,69 @@
                 "[resourceId('Microsoft.Compute/virtualMachines', concat(variables('oss_vm_name'), copyIndex(1)))]"
             ],
             "properties": {
-                "publisher": "Microsoft.Azure.Extensions",
-                "type": "CustomScript",
-                "typeHandlerVersion": "2.0",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                    "fileUris": "[variables('contentfileuris')]"
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('linux_extension_template')]"
                 },
-                "protectedSettings": {
-                    "commandToExecute": "cp lustre* response* /tmp/"
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "vmName": {
+                        "value": "[concat(variables('oss_vm_name'), copyIndex(1))]"
+                    },
+                    "commandToExecute": {
+                        "value": "cp lustre_packages.zip /tmp"
+                    },
+                    "filepath": {
+                        "value": "lustrepackages/lustre_packages.zip"
+                    },
+                    "_artifactsLocation": {
+                        "value": "[parameters('_artifactsLocation')]"
+                    },
+                    "_artifactsLocationSasToken": {
+                        "value": "[parameters('_artifactsLocationSasToken')]"
+                    }
+                }
+            }
+        },
+        {
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "[concat(variables('oss_vm_name'), copyIndex(1), 'ContentFile1Download')]",
+            "copy": {
+                "name": "ossfile1copy",
+                "count": "[parameters('numberOfLustreOSSNodes')]",
+                "mode": "serial",
+                "batchSize": 1
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('oss_vm_name'), copyIndex(1), 'ContentFileDownload'))]"
+            ],
+            "properties": {
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('linux_extension_template')]"
+                },
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "vmName": {
+                        "value": "[concat(variables('oss_vm_name'), copyIndex(1))]"
+                    },
+                    "commandToExecute": {
+                        "value": "cp lustre_server_pkg.zip /tmp"
+                    },
+                    "filepath": {
+                        "value": "lustrepackages/lustre_server_pkg.zip"
+                    },
+                    "_artifactsLocation": {
+                        "value": "[parameters('_artifactsLocation')]"
+                    },
+                    "_artifactsLocationSasToken": {
+                        "value": "[parameters('_artifactsLocationSasToken')]"
+                    }
                 }
             }
         },
@@ -4272,8 +4589,7 @@
                 "count": "[parameters('numberOfLustreOSSNodes')]"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', concat(variables('oss_vm_name'), copyIndex(1)))]",
-                "osscontentdownloadcopy"
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('oss_vm_name'), copyIndex(1), 'ContentFile1Download'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -4516,23 +4832,36 @@
             }
         },
         {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "apiVersion": "2015-06-15",
-            "name": "[concat(variables('microservices_vm_name'),'/ContentFileDownload')]",
-            "location": "[resourceGroup().location]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "[concat(variables('microservices_vm_name'), 'ContentFileDownload')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', 'MicroServicesAccessPolicy')]"
+				"[resourceId('Microsoft.Resources/deployments', 'MicroServicesAccessPolicy')]"
             ],
             "properties": {
-                "publisher": "Microsoft.Azure.Extensions",
-                "type": "CustomScript",
-                "typeHandlerVersion": "2.0",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                    "fileUris": "[variables('contentfileuris')]"
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('linux_extension_template')]"
                 },
-                "protectedSettings": {
-                    "commandToExecute": "cp viya-ark.tar.gz /tmp/"
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "vmName": {
+                        "value": "[variables('microservices_vm_name')]"
+                    },
+                    "commandToExecute": {
+                        "value": "cp viya-ark.tar.gz /tmp"
+                    },
+                    "filepath": {
+                        "value": "properties/viya-ark.tar.gz"
+                    },
+                    "_artifactsLocation": {
+                        "value": "[parameters('_artifactsLocation')]"
+                    },
+                    "_artifactsLocationSasToken": {
+                        "value": "[parameters('_artifactsLocationSasToken')]"
+                    }
                 }
             }
         },
@@ -4541,8 +4870,7 @@
             "apiVersion": "2019-10-01",
             "name": "Phase1-MicroServicesHostSetup",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', variables('microservices_vm_name'))]",
-                "[concat('Microsoft.Compute/virtualMachines/', variables('microservices_vm_name'), '/extensions/', 'ContentFileDownload')]"
+                   "[resourceId('Microsoft.Resources/deployments', concat(variables('microservices_vm_name'), 'ContentFileDownload') )]"             
             ],
             "properties": {
                 "mode": "Incremental",
@@ -4780,23 +5108,36 @@
             }
         },
         {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "apiVersion": "2015-06-15",
-            "name": "[concat(variables('spre_vm_name'),'/ContentFileDownload')]",
-            "location": "[resourceGroup().location]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "[concat(variables('spre_vm_name'), 'ContentFileDownload')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', 'SpreAccessPolicy')]"
+				"[resourceId('Microsoft.Resources/deployments', 'SpreAccessPolicy')]"
             ],
             "properties": {
-                "publisher": "Microsoft.Azure.Extensions",
-                "type": "CustomScript",
-                "typeHandlerVersion": "2.0",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                    "fileUris": "[variables('contentfileuris')]"
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('linux_extension_template')]"
                 },
-                "protectedSettings": {
-                    "commandToExecute": "cp viya-ark.tar.gz /tmp/"
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "vmName": {
+                        "value": "[variables('spre_vm_name')]"
+                    },
+                    "commandToExecute": {
+                        "value": "cp viya-ark.tar.gz /tmp"
+                    },
+                    "filepath": {
+                        "value": "properties/viya-ark.tar.gz"
+                    },
+                    "_artifactsLocation": {
+                        "value": "[parameters('_artifactsLocation')]"
+                    },
+                    "_artifactsLocationSasToken": {
+                        "value": "[parameters('_artifactsLocationSasToken')]"
+                    }
                 }
             }
         },
@@ -4805,8 +5146,7 @@
             "apiVersion": "2019-10-01",
             "name": "Phase1-SpreHostSetup",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines',  variables('spre_vm_name'))]",
-                "[concat('Microsoft.Compute/virtualMachines/', variables('spre_vm_name'), '/extensions/', 'ContentFileDownload')]"
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('spre_vm_name'), 'ContentFileDownload'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -5019,7 +5359,6 @@
             "name": "CAScontrollerAccessPolicy",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', variables('Cascontroller_vm_name'))]",
-                "[resourceID('Microsoft.Resources/deployments','MicroServicesAccessPolicy')]",
                 "[resourceId('Microsoft.KeyVault/vaults', variables('key_vault_name'))]",
                 "[resourceId('Microsoft.Resources/deployments','SpreAccessPolicy')]"
             ],
@@ -5051,23 +5390,36 @@
             }
         },
         {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "apiVersion": "2015-06-15",
-            "name": "[concat(variables('Cascontroller_vm_name'),'/ContentFileDownload')]",
-            "location": "[resourceGroup().location]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "[concat(variables('Cascontroller_vm_name'), 'ContentFileDownload')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', 'CAScontrollerAccessPolicy')]"
+				"[resourceId('Microsoft.Resources/deployments', 'CAScontrollerAccessPolicy')]"
             ],
             "properties": {
-                "publisher": "Microsoft.Azure.Extensions",
-                "type": "CustomScript",
-                "typeHandlerVersion": "2.0",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                    "fileUris": "[variables('contentfileuris')]"
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('linux_extension_template')]"
                 },
-                "protectedSettings": {
-                    "commandToExecute": "cp viya-ark.tar.gz /tmp/"
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "vmName": {
+                        "value": "[variables('Cascontroller_vm_name')]"
+                    },
+                    "commandToExecute": {
+                        "value": "cp viya-ark.tar.gz /tmp"
+                    },
+                    "filepath": {
+                        "value": "properties/viya-ark.tar.gz"
+                    },
+                    "_artifactsLocation": {
+                        "value": "[parameters('_artifactsLocation')]"
+                    },
+                    "_artifactsLocationSasToken": {
+                        "value": "[parameters('_artifactsLocationSasToken')]"
+                    }
                 }
             }
         },
@@ -5076,8 +5428,7 @@
             "apiVersion": "2019-10-01",
             "name": "Phase1-CASControllerHostSetup",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines',  variables('Cascontroller_vm_name'))]",
-                "[concat('Microsoft.Compute/virtualMachines/', variables('Cascontroller_vm_name'), '/extensions/', 'ContentFileDownload')]"
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('Cascontroller_vm_name'), 'ContentFileDownload'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -5327,29 +5678,42 @@
             }
         },
         {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "apiVersion": "2015-06-15",
-            "name": "[concat(variables('casworker_vm_name'), copyIndex(), '/ContentFileDownload')]",
-            "location": "[resourceGroup().location]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "[concat(variables('casworker_vm_name'), copyIndex(), 'ContentFileDownload')]",
             "copy": {
-                "name": "viyacontentdownloadcopy",
+                "name": "viyafile1copy",
                 "count": "[parameters('numberOfViyaCASNodes')]",
                 "mode": "serial",
                 "batchSize": 1
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', concat(variables('casworker_vm_name'), copyIndex(),'accesspolicy') )]"
+                "[resourceId('Microsoft.Resources/deployments',concat(variables('casworker_vm_name'), copyIndex(),'accesspolicy'))]"
             ],
             "properties": {
-                "publisher": "Microsoft.Azure.Extensions",
-                "type": "CustomScript",
-                "typeHandlerVersion": "2.0",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                    "fileUris": "[variables('contentfileuris')]"
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('linux_extension_template')]"
                 },
-                "protectedSettings": {
-                    "commandToExecute": "cp viya-ark.tar.gz /tmp/"
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "vmName": {
+                        "value": "[concat(variables('casworker_vm_name'), copyIndex())]"
+                    },
+                    "commandToExecute": {
+                        "value": "cp viya-ark.tar.gz /tmp"
+                    },
+                    "filepath": {
+                        "value": "properties/viya-ark.tar.gz"
+                    },
+                    "_artifactsLocation": {
+                        "value": "[parameters('_artifactsLocation')]"
+                    },
+                    "_artifactsLocationSasToken": {
+                        "value": "[parameters('_artifactsLocationSasToken')]"
+                    }
                 }
             }
         },
@@ -5362,8 +5726,7 @@
                 "count": "[parameters('numberOfViyaCASNodes')]"
             },
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines', concat(variables('casworker_vm_name'), copyIndex()))]",
-                "viyacontentdownloadcopy"
+                "[resourceId('Microsoft.Resources/deployments',concat(variables('casworker_vm_name'), copyIndex(),'ContentFileDownload'))]"
             ],
             "properties": {
                 "mode": "Incremental",
