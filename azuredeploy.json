@@ -2452,33 +2452,47 @@
             }
         },
         {
-            "type": "Microsoft.Compute/virtualMachines/extensions",
-            "apiVersion": "2015-06-15",
-            "name": "[concat(variables('meta_vm_name'),'/ContentFileDownload')]",
-            "location": "[resourceGroup().location]",
+            "type": "Microsoft.Resources/deployments",
+            "apiVersion": "2019-10-01",
+            "name": "[concat(variables('meta_vm_name'),'ContentFileDownload')]",
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', 'MetaAccessPolicy')]"
             ],
             "properties": {
-                "publisher": "Microsoft.Azure.Extensions",
-                "type": "CustomScript",
-                "typeHandlerVersion": "2.0",
-                "autoUpgradeMinorVersion": true,
-                "settings": {
-                    "fileUris": "[variables('contentfileuris')]"
+                "mode": "Incremental",
+                "templateLink": {
+                    "uri": "[variables('linux_extension_template')]"
                 },
-                "protectedSettings": {
-                    "commandToExecute": "cp lustre* response* /tmp/"
+                "parameters": {
+                    "location": {
+                        "value": "[parameters('location')]"
+                    },
+                    "vmName": {
+                        "value": "[variables('meta_vm_name')]"
+                    },
+                    "commandToExecute": {
+                        "value": "cp response-properties.tar.gz /tmp"
+                    },
+                    "filepath": {
+                        "value": "properties/response-properties.tar.gz"
+                    },
+                    "_artifactsLocation": {
+                        "value": "[parameters('_artifactsLocation')]"
+                    },
+                    "_artifactsLocationSasToken": {
+                        "value": "[parameters('_artifactsLocationSasToken')]"
+                    }
                 }
             }
         },
+
         {
             "type": "Microsoft.Resources/deployments",
             "apiVersion": "2019-10-01",
             "name": "Phase1-MetaHostSetup",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', variables('meta_vm_name'))]",
-                "[concat('Microsoft.Compute/virtualMachines/', variables('meta_vm_name'), '/extensions/', 'ContentFileDownload')]"               
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('meta_vm_name'),'ContentFileDownload'))]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -2748,7 +2762,7 @@
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2015-06-15",
-            "name": "[concat(variables('grid_vm_name'),'/ContentFileDownload')]",
+            "name": "[concat(variables('grid_vm_name'),'/InitStartup')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Resources/deployments', 'GridAccessPolicy')]"
@@ -2772,7 +2786,7 @@
             "name": "Phase1-GridHostSetup",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines',variables('grid_vm_name'))]",
-                "[concat('Microsoft.Compute/virtualMachines/', variables('grid_vm_name'), '/extensions/', 'ContentFileDownload')]"
+                "[concat('Microsoft.Compute/virtualMachines/', variables('grid_vm_name'), '/extensions/', 'InitStartup')]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -3459,10 +3473,10 @@
             "apiVersion": "2015-06-15",
             "name": "[concat(variables('gridnode_vm_name'), copyIndex(1), '/ContentFileDownload')]",
             "location": "[resourceGroup().location]",
-			"copy": {
+            "copy": {
                 "name": "contentdownloadcopy",
                 "count": "[parameters('numberOfSASGridNodes')]",
-				"mode": "serial",
+                "mode": "serial",
                 "batchSize": 1
             },
             "dependsOn": [
@@ -3707,7 +3721,7 @@
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
             "apiVersion": "2015-06-15",
-            "name": "[concat(variables('mgt_vm_name'), '/ContentFileDownload')]",
+            "name": "[concat(variables('mgt_vm_name'), '/InitStartup')]",
             "location": "[resourceGroup().location]",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', variables('mgt_vm_name'))]"
@@ -3731,7 +3745,7 @@
             "name": "Phase1-MgtHostSetup",
             "dependsOn": [
                 "[resourceId('Microsoft.Compute/virtualMachines', variables('mgt_vm_name'))]",
-                "[concat('Microsoft.Compute/virtualMachines/', variables('mgt_vm_name'), '/extensions/', 'ContentFileDownload')]"
+                "[concat('Microsoft.Compute/virtualMachines/', variables('mgt_vm_name'), '/extensions/', 'InitStartup')]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -4226,10 +4240,10 @@
             "apiVersion": "2015-06-15",
             "name": "[concat(variables('oss_vm_name'), copyIndex(1), '/ContentFileDownload')]",
             "location": "[resourceGroup().location]",
-			"copy": {
+            "copy": {
                 "name": "osscontentdownloadcopy",
                 "count": "[parameters('numberOfSASGridNodes')]",
-				"mode": "serial",
+                "mode": "serial",
                 "batchSize": 1
             },
             "dependsOn": [
@@ -5316,10 +5330,10 @@
             "apiVersion": "2015-06-15",
             "name": "[concat(variables('casworker_vm_name'), copyIndex(), '/ContentFileDownload')]",
             "location": "[resourceGroup().location]",
-			"copy": {
+            "copy": {
                 "name": "viyacontentdownloadcopy",
                 "count": "[parameters('numberOfViyaCASNodes')]",
-				"mode": "serial",
+                "mode": "serial",
                 "batchSize": 1
             },
             "dependsOn": [
