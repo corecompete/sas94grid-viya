@@ -2761,11 +2761,12 @@
         },
         {
             "type": "Microsoft.Compute/virtualMachines/extensions",
-            "apiVersion": "2015-06-15",
-            "name": "[concat(variables('grid_vm_name'),'/InitStartup')]",
-            "location": "[resourceGroup().location]",
+            "name": "[concat(variables('grid_vm_name'), '/', 'InitStartup')]",
+            "apiVersion": "2017-12-01",
+            "location": "[parameters('location')]",
             "dependsOn": [
-                "[resourceId('Microsoft.Resources/deployments', 'GridAccessPolicy')]"
+                "[concat('Microsoft.Compute/virtualMachines/', variables('grid_vm_name'))]",
+                "[resourceId('Microsoft.Resources/deployments','GridAccessPolicy')]"
             ],
             "properties": {
                 "publisher": "Microsoft.Azure.Extensions",
@@ -2773,7 +2774,9 @@
                 "typeHandlerVersion": "2.0",
                 "autoUpgradeMinorVersion": true,
                 "settings": {
-                    "fileUris": "[variables('contentfileuris')]"
+                    "fileUris": [
+                        "[variables('contentfileuris')]"
+                    ]
                 },
                 "protectedSettings": {
                     "commandToExecute": "cp lustre* response* /tmp/"
@@ -2785,7 +2788,6 @@
             "apiVersion": "2019-10-01",
             "name": "Phase1-GridHostSetup",
             "dependsOn": [
-                "[resourceId('Microsoft.Compute/virtualMachines',variables('grid_vm_name'))]",
                 "[concat('Microsoft.Compute/virtualMachines/', variables('grid_vm_name'), '/extensions/', 'InitStartup')]"
             ],
             "properties": {
