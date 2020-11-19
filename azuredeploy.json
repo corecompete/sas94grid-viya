@@ -2774,9 +2774,8 @@
                 "typeHandlerVersion": "2.0",
                 "autoUpgradeMinorVersion": true,
                 "settings": {
-                    "fileUris": [
-                        "[variables('contentfileuris')]"
-                    ]
+                    "fileUris": "[variables('contentfileuris')]"
+                    
                 },
                 "protectedSettings": {
                     "commandToExecute": "cp lustre* response* /tmp/"
