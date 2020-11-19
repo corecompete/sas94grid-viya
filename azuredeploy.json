@@ -4836,7 +4836,7 @@
             "apiVersion": "2019-10-01",
             "name": "[concat(variables('microservices_vm_name'), 'ContentFileDownload')]",
             "dependsOn": [
-				"[resourceId('Microsoft.Resources/deployments', 'MicroServicesAccessPolicy')]"
+                "[resourceId('Microsoft.Resources/deployments', 'MicroServicesAccessPolicy')]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -4870,7 +4870,7 @@
             "apiVersion": "2019-10-01",
             "name": "Phase1-MicroServicesHostSetup",
             "dependsOn": [
-                   "[resourceId('Microsoft.Resources/deployments', concat(variables('microservices_vm_name'), 'ContentFileDownload') )]"             
+                "[resourceId('Microsoft.Resources/deployments', concat(variables('microservices_vm_name'), 'ContentFileDownload') )]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -5112,7 +5112,7 @@
             "apiVersion": "2019-10-01",
             "name": "[concat(variables('spre_vm_name'), 'ContentFileDownload')]",
             "dependsOn": [
-				"[resourceId('Microsoft.Resources/deployments', 'SpreAccessPolicy')]"
+                "[resourceId('Microsoft.Resources/deployments', 'SpreAccessPolicy')]"
             ],
             "properties": {
                 "mode": "Incremental",
@@ -5394,7 +5394,7 @@
             "apiVersion": "2019-10-01",
             "name": "[concat(variables('Cascontroller_vm_name'), 'ContentFileDownload')]",
             "dependsOn": [
-				"[resourceId('Microsoft.Resources/deployments', 'CAScontrollerAccessPolicy')]"
+                "[resourceId('Microsoft.Resources/deployments', 'CAScontrollerAccessPolicy')]"
             ],
             "properties": {
                 "mode": "Incremental",
