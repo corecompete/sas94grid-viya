@@ -100,7 +100,7 @@
             "maxLength": 14,
             "type": "SecureString",
             "metadata": {
-                "description": "Password for RDP login & SAS admin account in SAS servers(SAS94:sasadm,SAS Viya:sas)"
+                "description": "Password for RDP login & SAS admin account in SAS servers(SAS Grid:sasadm,SAS Viya:sas)"
             }
         },
         "SASInternalPassword": {
@@ -108,7 +108,7 @@
             "maxLength": 15,
             "type": "SecureString",
             "metadata": {
-                "description": "Password for SAS Internal Accounts(SAS94: Metadata & WIP, SAS Viya:cas)"
+                "description": "Password for SAS Internal Accounts(SAS Grid: Metadata & WIP, SAS Viya:cas)"
             }
         },
         "lustrePrivateSubnetCIDR": {
@@ -225,7 +225,7 @@
             "type": "String",
             "defaultValue": "sasdepot",
             "metadata": {
-                "description": "Folder Name in Azure File share where SAS94 depot is located"
+                "description": "Folder Name in Azure File share where SAS Grid depot is located"
             }
         },
         "viyaRepoFolder": {
@@ -244,13 +244,13 @@
         "SASGridLicenseFile": {
             "type": "String",
             "metadata": {
-                "description": "Name of SAS Application Server License file.You will find this file inside the SAS Software Depot. It should be inside the folder sid_file."
+                "description": "Name of SAS Application GRID Server License file.You will find this file inside the SAS Software Depot. It should be inside the folder sid_file."
             }
         },
         "SASLsfLicenseFile": {
             "type": "String",
             "metadata": {
-                "description": "Name of SAS Application Server License file.You will find this file inside the SAS Software Depot. It should be inside the folder sid_file."
+                "description": "Name of LSF License file.You will find this file inside the SAS Software Depot. It should be inside the folder sid_file."
             }
         },
         "SSHPublicKey": {
@@ -274,7 +274,7 @@
         },
         "_artifactsLocation": {
             "type": "string",
-            "defaultValue": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/sas9.4-viya/",
+            "defaultValue": "https://raw.githubusercontent.com/Azure/azure-quickstart-templates/master/sasgrid-and-viya/",
             "metadata": {
                 "description": "The base URI where artifacts required by this template are located. When the template is deployed using the accompanying scripts, a private location in the subscription will be used and this value will be automatically generated."
             }
